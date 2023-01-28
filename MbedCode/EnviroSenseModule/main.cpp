@@ -18,7 +18,7 @@ void DataAquisition();
 
 int main()
 {
-    EQ_DataAquisition.call_every(1ms, DataAquisition);
+    EQ_DataAquisition.call_every(1s, DataAquisition); // change to a suitable time after testing
 
     Thread_DataAquisition.start(callback(&EQ_DataAquisition, &EventQueue::dispatch_forever));
     
@@ -36,6 +36,12 @@ void DataAquisition(){
     Data.TMP117RecieveData();
     Data.SoilMoistureRecieveData();
 
+    // Recieve Values for Rolling Average
     DataCollection::Values InVals;
     InVals = Data.ReturnValues();
+
+    // Rolling Average
+    Data.AvgResult.BME = Data.RollingAverage(InVals.BME);
+    Data.AvgResult.TMP = Data.RollingAverage(InVals.TMP);
+    Data.AvgResult.SM  = Data.RollingAverage(InVals.SM);
 }

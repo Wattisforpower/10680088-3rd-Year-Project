@@ -29,13 +29,20 @@ class DataCollection{
 
     protected:
     public:
+        // Value Structure
         typedef struct {
             float BME;
             float TMP;
             float SM;
         } Values;
 
+        // Average Result
+        DataCollection::Values AvgResult;
+
+        // Constructor
         DataCollection();
+
+        // Functions
         void BME280RecieveData();
         void TMP117RecieveData();
         void SoilMoistureRecieveData();

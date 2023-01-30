@@ -5,13 +5,13 @@
 #include "mbed.h"
 
 // Correct These to their actual values
-#define BMESDAPin PG_10
-#define BMESCLPin PG_11
+#define BMESDAPin PA_10
+#define BMESCLPin PA_9
 
-#define TMPSDAPin PG_12
-#define TMPSCLPin PG_13
+#define TMPSDAPin PB_4
+#define TMPSCLPin PA_7
 
-#define SoilMoisturePin PG_14
+#define SoilMoisturePin PA_6
 
 // Other Defines
 #define SIZE 10

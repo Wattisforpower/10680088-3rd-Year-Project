@@ -300,7 +300,27 @@ UpdateLabels()
 # Machine Learning
 # ========================================================================================
 
+ML = tk.Label(tab5, text="")
+ML.pack()
 
+def MachineLearningUpdate(Xval, Yval):
+    InitX, InitY = InitXY(Xval, Yval)
 
+    regLine, Coeff, B0, B1 = TrainModel(InitX, InitY)
+
+    PredX = Xval[-1] + 1.0
+
+    Prediction = Predict(B0, B1, PredX)
+
+    return Prediction
+
+def UpdateLabel():
+    Prediction = MachineLearningUpdate(x, y)
+
+    ML.config(text = "Pressure Prediction: " + str(Prediction))
+
+    ML.after(1000, UpdateLabel)
+
+UpdateLabel()
 
 root.mainloop()

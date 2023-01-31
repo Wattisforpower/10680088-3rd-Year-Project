@@ -3,3 +3,63 @@ http://tkdocs.com/index.html
 https://stackoverflow.com/questions/30667525/importerror-no-module-named-sklearn-cross-validation
 https://pythonprogramming.net/forecasting-predicting-machine-learning-tutorial/
 
+https://uk.mathworks.com/matlabcentral/answers/633899-export-data-from-matlab-to-python
+
+https://towardsdatascience.com/simple-linear-regression-in-python-numpy-only-130a988c0212
+
+
+# Random Stuff
+
+def PressureML():
+    PressureX, PressureY = InitXY(x, y)
+    PressureClf, PressureConfidence = TrainModel(PressureX, PressureY)
+
+    print(PressureConfidence)
+
+    NewX = (time.time() - StartTime)
+
+    PressureForecast = Predict(PressureClf, NewX)
+
+    return PressureForecast
+
+PressureML()
+
+PF = PressureML()
+
+print(PF)
+
+###
+
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import numpy as np
+import math
+from sklearn import preprocessing, model_selection, svm
+from sklearn.linear_model import LinearRegression
+import pandas as pd
+
+def InitXY(InputXArray, InputYArray):
+    X = np.asarray(InputXArray)
+    Y = np.asarray(InputYArray)
+    return X, Y
+
+def TrainModel(InputX, InputY):
+    InputX = InputX.reshape(-1, 1)
+    InputY = InputY.reshape(-1, 1)
+    XTrain, XTest, YTrain, YTest = model_selection.train_test_split(InputX, InputY, test_size=0.2)
+
+
+    regression = LinearRegression()
+    regression.fit(XTrain, YTrain)
+
+
+    return regression
+
+
+
+def Predict(regression, InputDataX):
+    InputDataX = np.asarray(InputDataX)
+    InputDataX = InputDataX.reshape(-1, 1)
+    Forecast = regression.predict(InputDataX)
+
+    return Forecast

@@ -4,25 +4,42 @@ import numpy as np
 import math
 from sklearn import preprocessing, model_selection, svm
 from sklearn.linear_model import LinearRegression
+import pandas as pd
 
 def InitXY(InputXArray, InputYArray):
-    X = InputXArray
-    Y = InputYArray
+    X = np.asarray(InputXArray)
+    Y = np.asarray(InputYArray)
     return X, Y
 
 def TrainModel(InputX, InputY):
-    X_train, X_test, Y_train, Y_test = model_selection.train_test_split(InputX, InputY, test_size=0.2)
-    clf = LinearRegression(n_jobs=1)
+    N = len(InputX)
+    # Regression Line
+    XMean = InputX.mean()
+    YMean = InputY.mean()
 
-    clf.fit(X_train, Y_train)
-    confidence = clf.score()
+    B1Numerator = ((InputX - XMean) * (InputY - YMean)).sum()
+    B1Denominator = ((InputX - XMean)**2).sum()
+    B1 = B1Numerator / B1Denominator
 
-    return clf, confidence 
+    B0 = YMean = (B1*XMean)
+
+    regressionLine = f'y = {B0} + {round(B1, 3)}'
+
+    # Correlation Coefficient
+    Numerator = (N * (InputX * InputY).sum()) - (InputX.sum() * InputY.sum())
+    Denominator = np.sqrt((N * (InputX**2).sum() - InputX.sum()**2) * (N * (InputY**2).sum() - InputY.sum()**2))
+
+    Coefficient = Numerator / Denominator
 
 
-def Predict(clf, InputDataX):
-    Forecast = clf.predict(InputDataX)
+    return regressionLine, Coefficient, B0, B1
+    
 
-    return Forecast
+
+
+def Predict(B0, B1, InputDataX):
+    y = B1 * InputDataX + B0
+
+    return y
 
 

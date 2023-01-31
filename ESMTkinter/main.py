@@ -3,7 +3,7 @@
 # Import Libraries
 import tkinter as tk
 from tkinter import ttk
-import time
+import sched, time
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
@@ -12,16 +12,20 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import collections
 from tkinter.ttk import Progressbar
+import math
+from sklearn import preprocessing, svm
+from sklearn.linear_model import LinearRegression
 
 import psutil # Remove when real data is used
 
 # Related Files
-
+from MachineLearning import *
 
 # ========================================================================================
 # Design Related Code
 # ========================================================================================
 
+'''
 # Loading Screen
 LoadScrn = tk.Tk()
 LoadScrnLabel = tk.Label(LoadScrn, text="Loading...", font = 18).pack()
@@ -42,6 +46,18 @@ def LoadScrnDestroy():
 LoadScrn.after(4000, LoadScrnDestroy)
 
 LoadScrn.mainloop()
+'''
+
+
+# Background Colours
+BkgndClr = '#0A75AD'
+BkgndClr_Graphs = '#84BAD6'
+Pressure_LineClr = '#AD0A75'
+Humidity_LineClr = '#AD420A'
+Temp_LineClr = '#75AD0A'
+SoilMoisture_LineClr = '#301708'
+
+
 
 # ========================================================================================
 # Init Code
@@ -53,6 +69,7 @@ mpl.use('TkAgg')
 
 
 root = tk.Tk()
+root.geometry("1200x800")
 
 root.title("EnviroSense Module")
 tabSys = ttk.Notebook(root)
@@ -73,40 +90,44 @@ tabSys.add(tab4, text = 'Soil Moisture')
 tabSys.pack(expand = 1, fill = "both")
 
 # ========================================================================================
-# Figures and Plos
+# Figures and Plots
 # ========================================================================================
 
 # Pressure
-FigureP = plt.figure(figsize=(12, 6), facecolor='#DEDEDE')
+FigureP = plt.figure(figsize=(12, 6), facecolor= BkgndClr)
 PressurePlot = plt.subplot(111)
-PressurePlot.set_facecolor('#DEDEDE')
+PressurePlot.set_facecolor(BkgndClr_Graphs)
 
 # Humidity
-FigureH = plt.figure(figsize=(12, 6), facecolor='#DEDEDE')
+FigureH = plt.figure(figsize=(12, 6), facecolor= BkgndClr)
 HumidityPlot = plt.subplot(111)
-HumidityPlot.set_facecolor('#DEDEDE')
+HumidityPlot.set_facecolor(BkgndClr_Graphs)
 
 # Temperature
-FigureT = plt.figure(figsize=(12, 6), facecolor='#DEDEDE')
+FigureT = plt.figure(figsize=(12, 6), facecolor= BkgndClr)
 TemperaturePlot = plt.subplot(111)
-TemperaturePlot.set_facecolor('#DEDEDE')
+TemperaturePlot.set_facecolor(BkgndClr_Graphs)
 
 # Soil Moisture
-FigureSM = plt.figure(figsize=(12,6), facecolor='#DEDEDE')
+FigureSM = plt.figure(figsize=(12,6), facecolor= BkgndClr)
 SoilMoisturePlot = plt.subplot(111)
-SoilMoisturePlot.set_facecolor('#DEDEDE')
+SoilMoisturePlot.set_facecolor(BkgndClr_Graphs)
 
 # Overview
-FigureAll = plt.figure(figsize=(12, 6), facecolor='#DEDEDE')
+FigureAll = plt.figure(figsize=(12, 6), facecolor= BkgndClr)
 plt.suptitle("Data Stream")
 
 AllPlotP = plt.subplot(221)
+AllPlotP.set_facecolor(BkgndClr_Graphs)
 
 AllPlotH = plt.subplot(222)
+AllPlotH.set_facecolor(BkgndClr_Graphs)
 
 AllPlotT = plt.subplot(223)
+AllPlotT.set_facecolor(BkgndClr_Graphs)
 
 AllPlotSM = plt.subplot(224)
+AllPlotSM.set_facecolor(BkgndClr_Graphs)
 
 # ========================================================================================
 # Allow for MatplotLib Graphing
@@ -150,8 +171,10 @@ def DataGenPressure(i):
     y.append(psutil.cpu_percent())
 
     PressureLabel.config(text=str(y[-1]))
-    PressurePlot.plot(x, y)
-    AllPlotP.plot(x, y)
+    PressurePlot.plot(x, y, color= Pressure_LineClr)
+    PressurePlot.set_title("Pressure")
+
+    AllPlotP.plot(x, y, color= Pressure_LineClr)
     AllPlotP.set_title("Pressure")
 
 # Humidity
@@ -172,8 +195,10 @@ def DataGenHumidity(i):
     yhum.append(psutil.virtual_memory().percent)
 
     HumidityLabel.config(text=str(yhum[-1]))
-    HumidityPlot.plot(xhum, yhum)
-    AllPlotH.plot(xhum, yhum)
+    HumidityPlot.plot(xhum, yhum, color = Humidity_LineClr)
+    HumidityPlot.set_title("Humidity")
+
+    AllPlotH.plot(xhum, yhum, color = Humidity_LineClr)
     AllPlotH.set_title("Humidity")
 
 # Temperature
@@ -194,8 +219,10 @@ def DataGenTemperature(i):
     yTemp.append(psutil.cpu_percent())
 
     TemperatureLabel.config(text=str(yTemp[-1]))
-    TemperaturePlot.plot(xTemp, yTemp)
-    AllPlotT.plot(xTemp, yTemp)
+    TemperaturePlot.plot(xTemp, yTemp, color = Temp_LineClr)
+    TemperaturePlot.set_title("Temperature")
+
+    AllPlotT.plot(xTemp, yTemp, color = Temp_LineClr)
     AllPlotT.set_title("Temperature")
 
 
@@ -217,10 +244,10 @@ def DataGenSoilMoisture(i):
     ySM.append(psutil.virtual_memory().percent)
 
     SoilMoistureLabel.config(text=str(ySM[-1]))
-    SoilMoisturePlot.plot(xSM, ySM)
+    SoilMoisturePlot.plot(xSM, ySM, SoilMoisture_LineClr)
     SoilMoisturePlot.set_title("Soil Moisture")
 
-    AllPlotSM.plot(xSM, ySM)
+    AllPlotSM.plot(xSM, ySM, SoilMoisture_LineClr)
     AllPlotSM.set_title("Soil Moisture")
 
 def AllFuncs(i):
@@ -238,5 +265,42 @@ animatePressure = FuncAnimation(FigureP, DataGenPressure, interval = 1000)
 animateHumidity = FuncAnimation(FigureH, DataGenHumidity, interval = 1000)
 animateTemperature = FuncAnimation(FigureT, DataGenTemperature, interval = 1000)
 animateSoilMoisture = FuncAnimation(FigureSM, DataGenSoilMoisture, interval = 1000)
+
+
+# ========================================================================================
+# Main Panel (tab5)
+# ========================================================================================
+
+MainLbl = tk.Label(tab5, text = "Live Data Stream")
+MainLbl.pack()
+
+PLbl = tk.Label(tab5, text="")
+PLbl.pack()
+
+HLbl = tk.Label(tab5, text="")
+HLbl.pack()
+
+TLbl = tk.Label(tab5, text="")
+TLbl.pack()
+
+SMLbl = tk.Label(tab5, text="")
+SMLbl.pack()
+
+def UpdateLabels():
+    PLbl.config(text="Pressure: " + str(y[-1]))
+    HLbl.config(text="Humidity: " + str(yhum[-1]))
+    TLbl.config(text="Temperature: " + str(yTemp[-1]))
+    SMLbl.config(text="Soil Moisture: " + str(ySM[-1]))
+
+    PLbl.after(1000, UpdateLabels)
+
+UpdateLabels()
+
+# ========================================================================================
+# Machine Learning
+# ========================================================================================
+
+
+
 
 root.mainloop()

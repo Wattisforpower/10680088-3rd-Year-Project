@@ -1,0 +1,5 @@
+https://www.geeksforgeeks.org/python-create-a-digital-clock-using-tkinter/
+http://tkdocs.com/index.html
+https://stackoverflow.com/questions/30667525/importerror-no-module-named-sklearn-cross-validation
+https://pythonprogramming.net/forecasting-predicting-machine-learning-tutorial/
+

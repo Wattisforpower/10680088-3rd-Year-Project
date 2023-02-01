@@ -139,10 +139,113 @@ def NNPredict(Weight1, Weight2, Input, Bias):
 
             
 
-W1, W2 = TrainWeightsStochastic(HiddenUnits, 10, Points, 0.1, Angles, 2)
+#W1, W2 = TrainWeightsStochastic(HiddenUnits, 100, Points, 0.1, Angles, 2)
 
-In = 32.2
+#In = 32.2
 
-Out = NNPredict(W1, W2, In, 2)
+#Out = NNPredict(W1, W2, In, 2)
 
-print(str(Out) + '\n')
+#print(str(Out) + '\n')
+
+
+# ==========================================================================
+# Forecasting
+# ==========================================================================
+
+# Written Using sources in sources.txt
+
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import GradientBoostingRegressor
+
+class Forecasting():
+    def __init__(self, X, Y):
+        self.x = pd.DataFrame(X , columns=['X'])
+        self.y = pd.DataFrame(Y, columns=['Y'])
+        #DataIn = np.concatenate(self.x, self.y)
+        #self.Data = pd.DataFrame(DataIn)
+
+    def PlotData(self):
+        Figure = plt.figure(figsize=(12, 6))
+        SubPlt = plt.subplot(111)
+        SubPlt.plot(self.x, self.y)
+
+        plt.show()
+    
+    def Modelling(self):
+        DataFrames = [self.x, self.y]
+        df = pd.concat(DataFrames, axis=1)
+        df['yPred'] = df['Y'].shift(-1)
+
+        train = df[:-25]
+        test = df[-25:]
+        test = test.drop(test.tail(1).index) # removes NaN
+
+        # Baseline Model
+        test = test.copy()
+        test['BasePred'] = test['Y']
+
+        # Decision Tree
+        XTrain = train['Y'].values.reshape(-1, 1)
+        YTrain = train['yPred'].values.reshape(-1, 1)
+        XTest = test['Y'].values.reshape(-1, 1)
+
+        DTRegression = DecisionTreeRegressor(random_state=42)
+        DTRegression.fit(X=XTrain, y=YTrain)
+
+        DTPredictions = DTRegression.predict(XTest)
+
+        test['DTPred'] = DTPredictions
+
+        # Gradient Boosting
+        GBR = GradientBoostingRegressor(random_state=42)
+
+        GBR.fit(XTrain, y = YTrain)
+
+        GBRPrediction = GBR.predict(XTest)
+
+        test['GBRPred'] = GBRPrediction
+
+        return test
+        
+    def MAPE(self, YTrue, YPred):
+        return round(np.mean(np.abs((YTrue - YPred) / YTrue)) * 100, 2)
+
+    def windowIO(self, input_length: int, output_length: int, data: pd.DataFrame) -> pd.DataFrame:
+        df = data.copy()
+
+        print(df)
+
+        i = 1
+
+        while i < input_length:
+            df[f'x_{i}'] = df['Y'].shift(-i)
+            i = i + 1
+        
+        j = 0
+
+        while j < output_length:
+            df[f'y_{j}'] = df['Y'].shift(-output_length-j)
+            j = j + 1
+
+
+
+        XCols = [col for col in df.columns if col.startswith('x')]
+
+        return df
+    
+
+    
+
+
+xVal = np.linspace(0, 100)
+yVal = np.random.rand(50) * xVal + 0
+
+Forecast = Forecasting(xVal, yVal)
+
+Test = Forecast.Modelling()
+print(Test)
+
+seq_df = Forecast.windowIO(25, 25, Test)
+
+print(seq_df)
+

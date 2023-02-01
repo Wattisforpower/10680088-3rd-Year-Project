@@ -301,6 +301,9 @@ UpdateLabels()
 ML = tk.Label(tab5, text="")
 ML.pack()
 
+
+# REGRESSION
+
 def MachineLearningUpdate(Xval, Yval):
     InitX, InitY = InitXY(Xval, Yval)
 
@@ -319,6 +322,8 @@ def UpdateLabel():
 
     ML.after(1000, UpdateLabel)
 
-UpdateLabel()
+#UpdateLabel()
+
+
 
 root.mainloop()

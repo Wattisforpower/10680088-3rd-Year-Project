@@ -13,8 +13,6 @@ from matplotlib.figure import Figure
 import collections
 from tkinter.ttk import Progressbar
 import math
-from sklearn import preprocessing, svm
-from sklearn.linear_model import LinearRegression
 
 import psutil # Remove when real data is used
 

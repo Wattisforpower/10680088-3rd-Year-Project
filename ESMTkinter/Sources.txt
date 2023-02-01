@@ -6,7 +6,8 @@ https://pythonprogramming.net/forecasting-predicting-machine-learning-tutorial/
 https://uk.mathworks.com/matlabcentral/answers/633899-export-data-from-matlab-to-python
 
 https://towardsdatascience.com/simple-linear-regression-in-python-numpy-only-130a988c0212
-
+https://numpy.org/doc/stable/reference/random/generated/numpy.random.rand.html
+https://www.w3schools.com/python/numpy/numpy_array_join.asp
 
 # Random Stuff
 

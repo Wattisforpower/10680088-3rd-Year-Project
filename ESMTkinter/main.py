@@ -13,7 +13,7 @@ from matplotlib.figure import Figure
 import collections
 from tkinter.ttk import Progressbar
 import math
-from scipy.ndimage import shift
+
 
 import psutil # Remove when real data is used
 
@@ -184,8 +184,8 @@ Tab6Display.get_tk_widget().pack()
 # ========================================================================================
 
 # Pressure
-x = collections.deque(np.zeros(50))
-y = collections.deque(np.zeros(50))
+x = collections.deque(np.zeros(10))
+y = collections.deque(np.zeros(10))
 
 PressureTitleLabel = tk.Label(tab1, text="Pressure: ").pack()
 PressureLabel = tk.Label(tab1, text="")

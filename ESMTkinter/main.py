@@ -13,6 +13,7 @@ from matplotlib.figure import Figure
 import collections
 from tkinter.ttk import Progressbar
 import math
+from scipy.ndimage import shift
 
 import psutil # Remove when real data is used
 
@@ -23,7 +24,7 @@ from MachineLearning import *
 # Design Related Code
 # ========================================================================================
 
-'''
+
 # Loading Screen
 LoadScrn = tk.Tk()
 LoadScrnLabel = tk.Label(LoadScrn, text="Loading...", font = 18).pack()
@@ -44,7 +45,7 @@ def LoadScrnDestroy():
 LoadScrn.after(4000, LoadScrnDestroy)
 
 LoadScrn.mainloop()
-'''
+
 
 
 # Background Colours
@@ -78,6 +79,7 @@ tab2 = ttk.Frame(tabSys)
 tab3 = ttk.Frame(tabSys)
 tab4 = ttk.Frame(tabSys)
 tab5 = ttk.Frame(tabSys)
+tab6 = ttk.Frame(tabSys)
 
 # Add Tabs
 tabSys.add(tab5, text = 'Overview')
@@ -85,7 +87,19 @@ tabSys.add(tab1, text = 'Pressure')
 tabSys.add(tab2, text = 'Humidity')
 tabSys.add(tab3, text = 'Temperature')
 tabSys.add(tab4, text = 'Soil Moisture')
+tabSys.add(tab6, text="Forecasting")
 tabSys.pack(expand = 1, fill = "both")
+
+# Variables
+
+xPres = np.ones(50)
+yPres = np.ones(50)
+xHumidity = np.ones(50)
+yHumidity = np.ones(50)
+xTemperature = np.ones(50)
+yTemperature = np.ones(50)
+xSoilMositure = np.ones(50)
+ySoilMoisture = np.ones(50)
 
 # ========================================================================================
 # Figures and Plots
@@ -127,6 +141,21 @@ AllPlotT.set_facecolor(BkgndClr_Graphs)
 AllPlotSM = plt.subplot(224)
 AllPlotSM.set_facecolor(BkgndClr_Graphs)
 
+
+# Testing Forecasting Plot
+FigureForecast = plt.figure(figsize=(12, 6), facecolor=BkgndClr)
+ForecastPressure = plt.subplot(221)
+ForecastPressure.set_facecolor(BkgndClr_Graphs)
+
+ForecastHumidity = plt.subplot(222)
+ForecastHumidity.set_facecolor(BkgndClr_Graphs)
+
+ForecastTemperature = plt.subplot(223)
+ForecastTemperature.set_facecolor(BkgndClr_Graphs)
+
+ForecastSoilMoisture = plt.subplot(224)
+ForecastSoilMoisture.set_facecolor(BkgndClr_Graphs)
+
 # ========================================================================================
 # Allow for MatplotLib Graphing
 # ========================================================================================
@@ -146,14 +175,17 @@ Tab3Display.get_tk_widget().pack()
 Tab4Display = FigureCanvasTkAgg(FigureSM, master=tab4)
 Tab4Display.get_tk_widget().pack()
 
+Tab6Display = FigureCanvasTkAgg(FigureForecast, master=tab6)
+Tab6Display.get_tk_widget().pack()
+
 
 # ========================================================================================
 # Functions
 # ========================================================================================
 
 # Pressure
-x = collections.deque(np.zeros(10))
-y = collections.deque(np.zeros(10))
+x = collections.deque(np.zeros(50))
+y = collections.deque(np.zeros(50))
 
 PressureTitleLabel = tk.Label(tab1, text="Pressure: ").pack()
 PressureLabel = tk.Label(tab1, text="")
@@ -162,6 +194,7 @@ PressureLabel.pack()
 def DataGenPressure(i):
     AllPlotP.cla()
     PressurePlot.cla()
+    
     x.popleft()
     x.append(time.time() - StartTime)
 
@@ -174,6 +207,7 @@ def DataGenPressure(i):
 
     AllPlotP.plot(x, y, color= Pressure_LineClr)
     AllPlotP.set_title("Pressure")
+
 
 # Humidity
 xhum = collections.deque(np.zeros(10))
@@ -298,32 +332,134 @@ UpdateLabels()
 # Machine Learning
 # ========================================================================================
 
-ML = tk.Label(tab5, text="")
-ML.pack()
+#xPres = collections.deque(np.zeros(10))
+#yPres = collections.deque(np.zeros(10))
+
+def ShiftValuesAlongOne(Array):
+    for i in range(50):
+        if i < 49:
+            Array[i] = Array[i + 1]
+        else:
+            Array[i] = 0
+    return Array
+
+def ForecastingPressure(i):
+    #DataGenPressure(i)
+
+    
+    np.delete(xPres, 0)
+    np.append(xPres, (time.time() - StartTime))
+
+    ForecastPressure.cla()
+
+    #np.delete(yPres, 0)
+    yVal = psutil.cpu_percent()
+    #yPresTemp = ShiftElements(yPres, -1, 0)
+    
+    yPres[:] = ShiftValuesAlongOne(yPres)
 
 
-# REGRESSION
+    yPres[-1] = yVal
 
-def MachineLearningUpdate(Xval, Yval):
-    InitX, InitY = InitXY(Xval, Yval)
+    PressureForecasting = Forecasting(xPres, yPres)
+    Test = PressureForecasting.Modelling()
+    df = PressureForecasting.windowIO(10, 10, Test)
+    DTSP, GBRP, XT, YT = PressureForecasting.ModellingTwo(df)
 
-    regLine, Coeff, B0, B1 = TrainModel(InitX, InitY)
+    ForecastPressure.plot(np.arange(0, 10), XT[1], 'b-')
+    ForecastPressure.plot(np.arange(10, 21), DTSP[1], color='green')
+    ForecastPressure.plot(np.arange(10, 21), GBRP[1], color='purple')
 
-    PredX = Xval[-1] + 1.0
+    ForecastPressure.plot()
 
-    Prediction = Predict(B0, B1, PredX)
+def ForecastingHumidity(i):
+    #DataGenPressure(i)
 
-    return Prediction
+    ForecastHumidity.cla()
 
-def UpdateLabel():
-    Prediction = MachineLearningUpdate(x, y)
+    np.delete(xHumidity, 0)
+    np.append(xHumidity, (time.time() - StartTime))
 
-    ML.config(text = "Pressure Prediction: " + str(Prediction))
+    #np.delete(yPres, 0)
+    yVal = psutil.cpu_percent()
+    #yPresTemp = ShiftElements(yPres, -1, 0)
+    
+    yHumidity[:] = ShiftValuesAlongOne(yHumidity)
 
-    ML.after(1000, UpdateLabel)
 
-#UpdateLabel()
+    yHumidity[-1] = yVal
+
+    HumidityForecasting = Forecasting(xHumidity, yHumidity)
+    Test = HumidityForecasting.Modelling()
+    df = HumidityForecasting.windowIO(10, 10, Test)
+    DTSP, GBRP, XT, YT = HumidityForecasting.ModellingTwo(df)
+
+    ForecastHumidity.plot(np.arange(0, 10), XT[1], 'b-')
+    ForecastHumidity.plot(np.arange(10, 21), DTSP[1], color='green')
+    ForecastHumidity.plot(np.arange(10, 21), GBRP[1], color='purple')
+
+    ForecastHumidity.plot()
+
+def ForecastingTemperature(i):
+    #DataGenPressure(i)
+
+    ForecastTemperature.cla()
+
+    np.delete(xTemperature, 0)
+    np.append(xTemperature, (time.time() - StartTime))
+
+    #np.delete(yPres, 0)
+    yVal = psutil.cpu_percent()
+    #yPresTemp = ShiftElements(yPres, -1, 0)
+    
+    yTemperature[:] = ShiftValuesAlongOne(yTemperature)
 
 
+    yTemperature[-1] = yVal
+
+    TemperatureForecasting = Forecasting(xTemperature, yTemperature)
+    Test = TemperatureForecasting.Modelling()
+    df = TemperatureForecasting.windowIO(10, 10, Test)
+    DTSP, GBRP, XT, YT = TemperatureForecasting.ModellingTwo(df)
+
+    ForecastTemperature.plot(np.arange(0, 10), XT[1], 'b-')
+    ForecastTemperature.plot(np.arange(10, 21), DTSP[1], color='green')
+    ForecastTemperature.plot(np.arange(10, 21), GBRP[1], color='purple')
+
+    ForecastTemperature.plot()
+
+def ForecastingSoilMoisture(i):
+    #DataGenPressure(i)
+
+    ForecastSoilMoisture.cla()
+
+    np.delete(xSoilMositure, 0)
+    np.append(xSoilMositure, (time.time() - StartTime))
+
+    #np.delete(yPres, 0)
+    yVal = psutil.cpu_percent()
+    #yPresTemp = ShiftElements(yPres, -1, 0)
+    
+    ySoilMoisture[:] = ShiftValuesAlongOne(ySoilMoisture)
+
+
+    ySoilMoisture[-1] = yVal
+
+    SoilMoistureForecasting = Forecasting(xSoilMositure, ySoilMoisture)
+    Test = SoilMoistureForecasting.Modelling()
+    df = SoilMoistureForecasting.windowIO(10, 10, Test)
+    DTSP, GBRP, XT, YT = SoilMoistureForecasting.ModellingTwo(df)
+
+    ForecastSoilMoisture.plot(np.arange(0, 10), XT[1], 'b-')
+    ForecastSoilMoisture.plot(np.arange(10, 21), DTSP[1], color='green')
+    ForecastSoilMoisture.plot(np.arange(10, 21), GBRP[1], color='purple')
+
+    ForecastSoilMoisture.plot()
+
+
+animatePressureForecasting = FuncAnimation(FigureForecast, ForecastingPressure, interval = 1000)
+animateHumidityForecasting = FuncAnimation(FigureForecast, ForecastingHumidity, interval = 1000)
+animateTemperatureForecasting = FuncAnimation(FigureForecast, ForecastingTemperature, interval = 1000)
+animateSoilMoistureForecasting = FuncAnimation(FigureForecast, ForecastingSoilMoisture, interval = 1000)
 
 root.mainloop()

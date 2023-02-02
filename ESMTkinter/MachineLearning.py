@@ -156,6 +156,7 @@ def NNPredict(Weight1, Weight2, Input, Bias):
 
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.multioutput import RegressorChain
 
 class Forecasting():
     def __init__(self, X, Y):
@@ -213,8 +214,6 @@ class Forecasting():
     def windowIO(self, input_length: int, output_length: int, data: pd.DataFrame) -> pd.DataFrame:
         df = data.copy()
 
-        print(df)
-
         i = 1
 
         while i < input_length:
@@ -227,15 +226,54 @@ class Forecasting():
             df[f'y_{j}'] = df['Y'].shift(-output_length-j)
             j = j + 1
 
-
-
-        XCols = [col for col in df.columns if col.startswith('x')]
+        df = df.dropna(axis = 0)
 
         return df
-    
+
+    def ModellingTwo(self, df):
+        # Split the Data
+
+        XCols = [col for col in df.columns if col.startswith('x')]
+        XCols.insert(0, 'Y')
+        YCols = [col for col in df.columns if col.startswith('y')]
+
+        XTraining = df[XCols][:-2].values
+        YTraining = df[YCols][:-2].values
+
+        XTesting = df[XCols][-2:].values
+        YTesting = df[YCols][-2:].values
+
+        # Decision Tree
+
+        DecisionTreeSequence = DecisionTreeRegressor(random_state=42)
+        DecisionTreeSequence.fit(XTraining, YTraining)
+
+        DecisionTreeSequencePrediction = DecisionTreeSequence.predict(XTesting)
+
+        # Gradient Boosting
+
+        GBR = GradientBoostingRegressor(random_state=42)
+        ChainedGBR = RegressorChain(GBR)
+        ChainedGBR.fit(XTraining, YTraining)
+
+        GBRPrediction = ChainedGBR.predict(XTesting)
+
+        return DecisionTreeSequencePrediction, GBRPrediction, XTesting, YTesting
+
+    def PlotPrediction(self, DTSP, GBRP, XT, YT):
+        fig, ax = plt.subplots(figsize=(16, 11))
+
+        ax.plot(np.arange(0, 10, 1), XT[1], 'b-', label = "Input")
+        ax.plot(np.arange(10, 21, 1), YT[1], color='blue', label="Actual")
+        ax.plot(np.arange(10, 21, 1), DTSP[1], color='green', label="DT")
+        ax.plot(np.arange(10, 21, 1), GBRP[1], color='purple', label="GB")
+
+        plt.show()
 
     
 
+'''
+Example Code:
 
 xVal = np.linspace(0, 100)
 yVal = np.random.rand(50) * xVal + 0
@@ -243,9 +281,11 @@ yVal = np.random.rand(50) * xVal + 0
 Forecast = Forecasting(xVal, yVal)
 
 Test = Forecast.Modelling()
-print(Test)
 
-seq_df = Forecast.windowIO(25, 25, Test)
+seq_df = Forecast.windowIO(10, 10, Test)
 
-print(seq_df)
+DTSP, GBRP, XT, YT = Forecast.ModellingTwo(seq_df)
+
+Forecast.PlotPrediction(DTSP, GBRP, XT, YT)
+'''
 

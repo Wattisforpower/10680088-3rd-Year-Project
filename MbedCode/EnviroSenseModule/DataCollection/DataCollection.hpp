@@ -11,7 +11,7 @@
 #define TMPSDAPin PB_4
 #define TMPSCLPin PA_7
 
-#define SoilMoisturePin PA_6
+#define SoilMoisturePin PA_0
 
 // Other Defines
 #define SIZE 10

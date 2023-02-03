@@ -457,9 +457,9 @@ def ForecastingSoilMoisture(i):
     ForecastSoilMoisture.plot()
 
 
-animatePressureForecasting = FuncAnimation(FigureForecast, ForecastingPressure, interval = 1000)
-animateHumidityForecasting = FuncAnimation(FigureForecast, ForecastingHumidity, interval = 1000)
-animateTemperatureForecasting = FuncAnimation(FigureForecast, ForecastingTemperature, interval = 1000)
-animateSoilMoistureForecasting = FuncAnimation(FigureForecast, ForecastingSoilMoisture, interval = 1000)
+animatePressureForecasting = FuncAnimation(FigureForecast, ForecastingPressure, interval = 2000)
+animateHumidityForecasting = FuncAnimation(FigureForecast, ForecastingHumidity, interval = 2000)
+animateTemperatureForecasting = FuncAnimation(FigureForecast, ForecastingTemperature, interval = 2000)
+animateSoilMoistureForecasting = FuncAnimation(FigureForecast, ForecastingSoilMoisture, interval = 2000)
 
 root.mainloop()

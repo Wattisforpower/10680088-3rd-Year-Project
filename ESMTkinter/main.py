@@ -18,7 +18,9 @@ import math
 import psutil # Remove when real data is used
 
 # Related Files
-from MachineLearning import *
+from MachineLearning.MachineLearning import *
+import MachineLearning.TensorflowML as TensorflowML
+import MachineLearning.PyTorch as PyTorch
 
 # ========================================================================================
 # Design Related Code
@@ -80,6 +82,7 @@ tab3 = ttk.Frame(tabSys)
 tab4 = ttk.Frame(tabSys)
 tab5 = ttk.Frame(tabSys)
 tab6 = ttk.Frame(tabSys)
+tab7 = ttk.Frame(tabSys)
 
 # Add Tabs
 tabSys.add(tab5, text = 'Overview')
@@ -87,7 +90,8 @@ tabSys.add(tab1, text = 'Pressure')
 tabSys.add(tab2, text = 'Humidity')
 tabSys.add(tab3, text = 'Temperature')
 tabSys.add(tab4, text = 'Soil Moisture')
-tabSys.add(tab6, text="Forecasting")
+tabSys.add(tab6, text = "Forecasting")
+tabSys.add(tab7, text = "Tensor")
 tabSys.pack(expand = 1, fill = "both")
 
 # Variables
@@ -156,11 +160,15 @@ ForecastTemperature.set_facecolor(BkgndClr_Graphs)
 ForecastSoilMoisture = plt.subplot(224)
 ForecastSoilMoisture.set_facecolor(BkgndClr_Graphs)
 
+# TensorFlowTesting
+FigureTensor = plt.figure(figsize=(12, 6))
+FigureTensorSub = plt.subplot(111)
+
 # ========================================================================================
 # Allow for MatplotLib Graphing
 # ========================================================================================
 
-Tab5Display = FigureCanvasTkAgg(FigureAll, master=tab5);
+Tab5Display = FigureCanvasTkAgg(FigureAll, master=tab5)
 Tab5Display.get_tk_widget().pack()
 
 Tab1Display = FigureCanvasTkAgg(FigureP, master=tab1)
@@ -178,6 +186,7 @@ Tab4Display.get_tk_widget().pack()
 Tab6Display = FigureCanvasTkAgg(FigureForecast, master=tab6)
 Tab6Display.get_tk_widget().pack()
 
+Tab7Display = FigureCanvasTkAgg(FigureTensor, master=tab7)
 
 # ========================================================================================
 # Functions
@@ -332,6 +341,13 @@ UpdateLabels()
 # Machine Learning
 # ========================================================================================
 
+
+
+    
+
+
+
+'''
 #xPres = collections.deque(np.zeros(10))
 #yPres = collections.deque(np.zeros(10))
 
@@ -461,5 +477,5 @@ animatePressureForecasting = FuncAnimation(FigureForecast, ForecastingPressure, 
 animateHumidityForecasting = FuncAnimation(FigureForecast, ForecastingHumidity, interval = 2000)
 animateTemperatureForecasting = FuncAnimation(FigureForecast, ForecastingTemperature, interval = 2000)
 animateSoilMoistureForecasting = FuncAnimation(FigureForecast, ForecastingSoilMoisture, interval = 2000)
-
+'''
 root.mainloop()

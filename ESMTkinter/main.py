@@ -19,8 +19,8 @@ import psutil # Remove when real data is used
 
 # Related Files
 from MachineLearning.MachineLearning import *
-import MachineLearning.TensorflowML as TensorflowML
-import MachineLearning.PyTorch as PyTorch
+#import MachineLearning.TensorflowML as TensorflowML
+#import MachineLearning.PyTorch as PyTorch
 
 # ========================================================================================
 # Design Related Code
@@ -96,14 +96,24 @@ tabSys.pack(expand = 1, fill = "both")
 
 # Variables
 
-xPres = np.ones(50)
-yPres = np.ones(50)
-xHumidity = np.ones(50)
-yHumidity = np.ones(50)
-xTemperature = np.ones(50)
-yTemperature = np.ones(50)
-xSoilMositure = np.ones(50)
-ySoilMoisture = np.ones(50)
+xPres = np.ones(10)
+yPres = np.ones(10)
+xHumidity = np.ones(10)
+yHumidity = np.ones(10)
+xTemperature = np.ones(10)
+yTemperature = np.ones(10)
+xSoilMositure = np.ones(10)
+ySoilMoisture = np.ones(10)
+
+def ShiftArray(Array):
+    TempArray = np.ones(len(Array))
+
+    for x in range(len(Array) - 1):
+        TempArray[x] = Array[x+1]
+    
+    TempArray[-1] = 0
+
+    return TempArray
 
 # ========================================================================================
 # Figures and Plots
@@ -193,8 +203,6 @@ Tab7Display = FigureCanvasTkAgg(FigureTensor, master=tab7)
 # ========================================================================================
 
 # Pressure
-x = collections.deque(np.zeros(10))
-y = collections.deque(np.zeros(10))
 
 PressureTitleLabel = tk.Label(tab1, text="Pressure: ").pack()
 PressureLabel = tk.Label(tab1, text="")
@@ -203,24 +211,25 @@ PressureLabel.pack()
 def DataGenPressure(i):
     AllPlotP.cla()
     PressurePlot.cla()
-    
-    x.popleft()
-    x.append(time.time() - StartTime)
+   
+    global xPres
+    global yPres
 
-    y.popleft()
-    y.append(psutil.cpu_percent())
+    xPres = ShiftArray(xPres)
+    yPres = ShiftArray(yPres)
 
-    PressureLabel.config(text=str(y[-1]))
-    PressurePlot.plot(x, y, color= Pressure_LineClr)
+    xPres[-1] = time.time()-StartTime
+    yPres[-1] = psutil.cpu_percent()
+
+    PressurePlot.plot(xPres, yPres, color= Pressure_LineClr)
     PressurePlot.set_title("Pressure")
+    PressureLabel.config(text=str(yPres[-1]))
 
-    AllPlotP.plot(x, y, color= Pressure_LineClr)
+    AllPlotP.plot(xPres, yPres, color= Pressure_LineClr)
     AllPlotP.set_title("Pressure")
 
 
 # Humidity
-xhum = collections.deque(np.zeros(10))
-yhum = collections.deque(np.zeros(10))
 
 HumidityTitleLabel = tk.Label(tab2, text="Humidity: ").pack()
 HumidityLabel = tk.Label(tab2, text="")
@@ -229,23 +238,25 @@ HumidityLabel.pack()
 def DataGenHumidity(i):
     AllPlotH.cla()
     HumidityPlot.cla()
-    xhum.popleft()
-    xhum.append(time.time() - StartTime)
 
-    yhum.popleft()
-    yhum.append(psutil.virtual_memory().percent)
+    global xHumidity
+    global yHumidity
 
-    HumidityLabel.config(text=str(yhum[-1]))
-    HumidityPlot.plot(xhum, yhum, color = Humidity_LineClr)
+    xHumidity = ShiftArray(xHumidity)
+    yHumidity = ShiftArray(yHumidity)
+
+    xHumidity[-1] = time.time() - StartTime
+    yTempVal = psutil.virtual_memory().percent
+    yHumidity[-1] = yTempVal
+
+    HumidityPlot.plot(xHumidity, yHumidity, color = Humidity_LineClr)
     HumidityPlot.set_title("Humidity")
+    HumidityLabel.config(text=str(yHumidity[-1]))
 
-    AllPlotH.plot(xhum, yhum, color = Humidity_LineClr)
+    AllPlotH.plot(xHumidity, yHumidity, color = Humidity_LineClr)
     AllPlotH.set_title("Humidity")
 
 # Temperature
-xTemp = collections.deque(np.zeros(10))
-yTemp = collections.deque(np.zeros(10))
-
 TemperatureTitleLabel = tk.Label(tab3, text="Temperature: ").pack()
 TemperatureLabel = tk.Label(tab3, text="")
 TemperatureLabel.pack()
@@ -253,24 +264,25 @@ TemperatureLabel.pack()
 def DataGenTemperature(i):
     AllPlotT.cla()
     TemperaturePlot.cla()
-    xTemp.popleft()
-    xTemp.append(time.time() - StartTime)
 
-    yTemp.popleft()
-    yTemp.append(psutil.cpu_percent())
+    global xTemperature
+    global yTemperature
+    
+    xTemperature = ShiftArray(xTemperature)
+    yTemperature = ShiftArray(yTemperature)
 
-    TemperatureLabel.config(text=str(yTemp[-1]))
-    TemperaturePlot.plot(xTemp, yTemp, color = Temp_LineClr)
+    xTemperature[-1] = time.time() - StartTime
+    yTemperature[-1] = psutil.cpu_percent()
+
+    TemperatureLabel.config(text=str(yTemperature[-1]))
+    TemperaturePlot.plot(xTemperature, yTemperature, color = Temp_LineClr)
     TemperaturePlot.set_title("Temperature")
 
-    AllPlotT.plot(xTemp, yTemp, color = Temp_LineClr)
+    AllPlotT.plot(xTemperature, yTemperature, color = Temp_LineClr)
     AllPlotT.set_title("Temperature")
 
 
 # Soil Moisture
-xSM = collections.deque(np.zeros(10))
-ySM = collections.deque(np.zeros(10))
-
 SoilMoistureTitleLabel = tk.Label(tab4, text="Soil Moisture: ").pack()
 SoilMoistureLabel = tk.Label(tab4, text="")
 SoilMoistureLabel.pack()
@@ -278,17 +290,21 @@ SoilMoistureLabel.pack()
 def DataGenSoilMoisture(i):
     AllPlotSM.cla()
     SoilMoisturePlot.cla()
-    xSM.popleft()
-    xSM.append(time.time() - StartTime)
 
-    ySM.popleft()
-    ySM.append(psutil.virtual_memory().percent)
+    global xSoilMositure
+    global ySoilMoisture
+    
+    xSoilMositure = ShiftArray(xSoilMositure)
+    ySoilMoisture = ShiftArray(ySoilMoisture)
 
-    SoilMoistureLabel.config(text=str(ySM[-1]))
-    SoilMoisturePlot.plot(xSM, ySM, SoilMoisture_LineClr)
+    xSoilMositure[-1] = time.time() - StartTime
+    ySoilMoisture[-1] = psutil.virtual_memory().percent
+
+    SoilMoistureLabel.config(text=str(ySoilMoisture[-1]))
+    SoilMoisturePlot.plot(xSoilMositure, ySoilMoisture, SoilMoisture_LineClr)
     SoilMoisturePlot.set_title("Soil Moisture")
 
-    AllPlotSM.plot(xSM, ySM, SoilMoisture_LineClr)
+    AllPlotSM.plot(xSoilMositure, ySoilMoisture, SoilMoisture_LineClr)
     AllPlotSM.set_title("Soil Moisture")
 
 def AllFuncs(i):
@@ -328,10 +344,10 @@ SMLbl = tk.Label(tab5, text="")
 SMLbl.pack()
 
 def UpdateLabels():
-    PLbl.config(text="Pressure: " + str(y[-1]))
-    HLbl.config(text="Humidity: " + str(yhum[-1]))
-    TLbl.config(text="Temperature: " + str(yTemp[-1]))
-    SMLbl.config(text="Soil Moisture: " + str(ySM[-1]))
+    PLbl.config(text="Pressure: " + str(yPres[-1]))
+    HLbl.config(text="Humidity: " + str(yHumidity[-1]))
+    TLbl.config(text="Temperature: " + str(yTemperature[-1]))
+    SMLbl.config(text="Soil Moisture: " + str(ySoilMoisture[-1]))
 
     PLbl.after(1000, UpdateLabels)
 

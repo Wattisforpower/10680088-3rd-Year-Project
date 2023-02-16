@@ -211,6 +211,7 @@ PressureLabel.pack()
 def DataGenPressure(i):
     AllPlotP.cla()
     PressurePlot.cla()
+    ForecastPressure.cla()
    
     global xPres
     global yPres
@@ -227,6 +228,15 @@ def DataGenPressure(i):
 
     AllPlotP.plot(xPres, yPres, color= Pressure_LineClr)
     AllPlotP.set_title("Pressure")
+
+    # Machine Learning (Regression)
+
+    PredX, PredY, Grad = PressureRegression(xPres, yPres)
+
+    ForecastPressure.plot(PredX, PredY)
+    ForecastPressure.set_title("Future Pressure")
+
+
 
 
 # Humidity
@@ -357,141 +367,26 @@ UpdateLabels()
 # Machine Learning
 # ========================================================================================
 
+def PressureRegression(xPres, yPres):
 
+    # Initialise the Prediction
+    PressureRegression = Predict(xPres, yPres)
 
-    
+    RegLine, Coeff, C , Grad = PressureRegression.TrainModel()
 
+    Next10XVals = np.ones(10)
 
-
-'''
-#xPres = collections.deque(np.zeros(10))
-#yPres = collections.deque(np.zeros(10))
-
-def ShiftValuesAlongOne(Array):
-    for i in range(50):
-        if i < 49:
-            Array[i] = Array[i + 1]
+    for i in range(10):
+        if i == 0:
+            Next10XVals[i] = xPres[-1] + 1
         else:
-            Array[i] = 0
-    return Array
-
-def ForecastingPressure(i):
-    #DataGenPressure(i)
-
+            Next10XVals[i] = Next10XVals[i - 1] + 1
     
-    np.delete(xPres, 0)
-    np.append(xPres, (time.time() - StartTime))
+    PredictedY = PressureRegression.PredictArray(Next10XVals)
 
-    ForecastPressure.cla()
-
-    #np.delete(yPres, 0)
-    yVal = psutil.cpu_percent()
-    #yPresTemp = ShiftElements(yPres, -1, 0)
-    
-    yPres[:] = ShiftValuesAlongOne(yPres)
+    return Next10XVals, PredictedY, Grad
 
 
-    yPres[-1] = yVal
-
-    PressureForecasting = Forecasting(xPres, yPres)
-    Test = PressureForecasting.Modelling()
-    df = PressureForecasting.windowIO(10, 10, Test)
-    DTSP, GBRP, XT, YT = PressureForecasting.ModellingTwo(df)
-
-    ForecastPressure.plot(np.arange(0, 10), XT[1], 'b-')
-    ForecastPressure.plot(np.arange(10, 21), DTSP[1], color='green')
-    ForecastPressure.plot(np.arange(10, 21), GBRP[1], color='purple')
-
-    ForecastPressure.plot()
-
-def ForecastingHumidity(i):
-    #DataGenPressure(i)
-
-    ForecastHumidity.cla()
-
-    np.delete(xHumidity, 0)
-    np.append(xHumidity, (time.time() - StartTime))
-
-    #np.delete(yPres, 0)
-    yVal = psutil.cpu_percent()
-    #yPresTemp = ShiftElements(yPres, -1, 0)
-    
-    yHumidity[:] = ShiftValuesAlongOne(yHumidity)
 
 
-    yHumidity[-1] = yVal
-
-    HumidityForecasting = Forecasting(xHumidity, yHumidity)
-    Test = HumidityForecasting.Modelling()
-    df = HumidityForecasting.windowIO(10, 10, Test)
-    DTSP, GBRP, XT, YT = HumidityForecasting.ModellingTwo(df)
-
-    ForecastHumidity.plot(np.arange(0, 10), XT[1], 'b-')
-    ForecastHumidity.plot(np.arange(10, 21), DTSP[1], color='green')
-    ForecastHumidity.plot(np.arange(10, 21), GBRP[1], color='purple')
-
-    ForecastHumidity.plot()
-
-def ForecastingTemperature(i):
-    #DataGenPressure(i)
-
-    ForecastTemperature.cla()
-
-    np.delete(xTemperature, 0)
-    np.append(xTemperature, (time.time() - StartTime))
-
-    #np.delete(yPres, 0)
-    yVal = psutil.cpu_percent()
-    #yPresTemp = ShiftElements(yPres, -1, 0)
-    
-    yTemperature[:] = ShiftValuesAlongOne(yTemperature)
-
-
-    yTemperature[-1] = yVal
-
-    TemperatureForecasting = Forecasting(xTemperature, yTemperature)
-    Test = TemperatureForecasting.Modelling()
-    df = TemperatureForecasting.windowIO(10, 10, Test)
-    DTSP, GBRP, XT, YT = TemperatureForecasting.ModellingTwo(df)
-
-    ForecastTemperature.plot(np.arange(0, 10), XT[1], 'b-')
-    ForecastTemperature.plot(np.arange(10, 21), DTSP[1], color='green')
-    ForecastTemperature.plot(np.arange(10, 21), GBRP[1], color='purple')
-
-    ForecastTemperature.plot()
-
-def ForecastingSoilMoisture(i):
-    #DataGenPressure(i)
-
-    ForecastSoilMoisture.cla()
-
-    np.delete(xSoilMositure, 0)
-    np.append(xSoilMositure, (time.time() - StartTime))
-
-    #np.delete(yPres, 0)
-    yVal = psutil.cpu_percent()
-    #yPresTemp = ShiftElements(yPres, -1, 0)
-    
-    ySoilMoisture[:] = ShiftValuesAlongOne(ySoilMoisture)
-
-
-    ySoilMoisture[-1] = yVal
-
-    SoilMoistureForecasting = Forecasting(xSoilMositure, ySoilMoisture)
-    Test = SoilMoistureForecasting.Modelling()
-    df = SoilMoistureForecasting.windowIO(10, 10, Test)
-    DTSP, GBRP, XT, YT = SoilMoistureForecasting.ModellingTwo(df)
-
-    ForecastSoilMoisture.plot(np.arange(0, 10), XT[1], 'b-')
-    ForecastSoilMoisture.plot(np.arange(10, 21), DTSP[1], color='green')
-    ForecastSoilMoisture.plot(np.arange(10, 21), GBRP[1], color='purple')
-
-    ForecastSoilMoisture.plot()
-
-
-animatePressureForecasting = FuncAnimation(FigureForecast, ForecastingPressure, interval = 2000)
-animateHumidityForecasting = FuncAnimation(FigureForecast, ForecastingHumidity, interval = 2000)
-animateTemperatureForecasting = FuncAnimation(FigureForecast, ForecastingTemperature, interval = 2000)
-animateSoilMoistureForecasting = FuncAnimation(FigureForecast, ForecastingSoilMoisture, interval = 2000)
-'''
 root.mainloop()

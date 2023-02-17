@@ -13,12 +13,15 @@ import numpy as np
 
 import time
 
+import MachineLearning.Predict as ML
+
 import psutil
 
-# 6 Pages of the document with each page being as follows:
+# 7 Pages of the document with each page being as follows:
 # Page 1 - Dashboard
 # Page 2 - 5 - Prediction
-# Page 6 - About GUI
+# Page 6 - Weather Pattern Prediction
+# Page 7 - About GUI
 
 ###############################################################
 # Generations of Data
@@ -43,6 +46,10 @@ class DataGenandStats:
         self.PlotAll = plt.Figure(figsize=(12, 6), facecolor='#bbbbbb')
         self.PlotAllsp = self.PlotAll.add_subplot()
         self.PlotAllsp.set_facecolor('#cccccc')
+
+        self.PlotPressurePrediction = plt.Figure(figsize=(12, 6), facecolor='#bbbbbb')
+        self.PlotPressurePredictionsp = self.PlotPressurePrediction.add_subplot()
+        self.PlotAll.set_facecolor('#cccccc')
 
         self.PressureColour = '#AD0A75'
         self.HumidityColour = '#AD420A'
@@ -183,6 +190,12 @@ class DataGenandStats:
         self.DashboardSMPlot = FuncAnimation(self.PlotAll, self.PlotonlySoilMoisutre, interval = 1000)
         self.DashboardAllPlot = FuncAnimation(self.PlotAll, self.PlotAllFunc, interval = 1000)
 
+        self.DashboardAllPlot.resume()
+        self.DashboardPPlot.pause()
+        self.DashboardHPlot.pause()
+        self.DashboardTPlot.pause()
+        self.DashboardSMPlot.pause()
+
     def animateplots(self) -> None:
         self.DashboardAllPlot.resume()
         self.DashboardPPlot.pause()
@@ -217,28 +230,53 @@ class DataGenandStats:
         self.DashboardPPlot.pause()
         self.DashboardTPlot.pause()
         self.DashboardSMPlot.resume()
-        
 
+    def Time(self, Label) -> None:
+        CurrentTime = time.strftime('%H:%M:%S %p')
+        Label.config(text = CurrentTime)
+
+        Label.after(1000, self.Time)
+
+    def PressurePrediction(self, i):
+        Forecasting = ML.Forecasting(self.PressureX, self.PressureY)
+
+        Model = Forecasting.Modelling()
+        SequenceDataFrame = Forecasting.windowIO(5, 5, Model)
+        DTSP, GBRP, XT, YT = Forecasting.ModellingTwo(SequenceDataFrame)
+
+        self.
+        
 def main():
     root = tk.Tk()
     root.title("EnviroSense Module Hub")
     root.geometry('1440x720')
     mpl.use('TkAgg')
+
+    # Tabs
     Tabs = ttk.Notebook(root)
     Dashboard = ttk.Frame(Tabs)
-    Tabs.add(Dashboard, text = "DashBoard")
+    PressurePrediction = ttk.Frame(Tabs)
+    Tabs.add(Dashboard, text = "Dashboard")
+    Tabs.add(PressurePrediction, text = "Pressure Prediction")
     Tabs.pack(expand=1, fill="both")
 
     Data = DataGenandStats()
+
+    ######### Dashboard #########
+
     # Buttons
     DisplayAllBtn = tk.Button(Dashboard, text = "Show All", command = Data.animateplots)
     DisplayAllBtn.place(x=50, y=50)
+
     DisplayPressureBtn = tk.Button(Dashboard, text = "Show Pressure", command = Data.animatePplots)
     DisplayPressureBtn.place(x=50, y=100)
+
     DisplayHumidityBtn = tk.Button(Dashboard, text = "Show Humidity", command = Data.animateHplots)
     DisplayHumidityBtn.place(x=50, y = 150)
+
     DisplayTemperatureBtn = tk.Button(Dashboard, text = "Show Temperature", command = Data.animateTplots)
     DisplayTemperatureBtn.place(x = 50, y = 200)
+
     DisplaySMBtn = tk.Button(Dashboard, text = "Show Soil Moisutre", command = Data.animateSMplots)
     DisplaySMBtn.place(x = 50, y = 250)
 
@@ -248,6 +286,14 @@ def main():
     DashboardDisplay.get_tk_widget().place(x = 200, y = 20)
     
     Data.InitAnimations()
+    
+    ######### Pressure Prediction
+
+
+    PressureDisplay = FigureCanvasTkAgg(Data.PlotPressurePrediction, master = PressurePrediction)
+    PressureDisplay.get_tk_widget().place(x = 10, y = 10)
+
+    Data.animatePressurePrediction()
     
 
     

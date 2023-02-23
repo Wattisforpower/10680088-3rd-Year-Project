@@ -43,25 +43,20 @@ class DataGenandStats:
         self.SoilMositureX = np.ones(self.limit)
         self.SoilMositureY = np.ones(self.limit)
 
+
+        self.PressureGrad = 0
+        self.HumidityGrad = 0
+        self.TemperatureGrad = 0
+        self.SoilMoistureGrad = 0
+
         self.PlotAll = plt.Figure(figsize=(12, 6), facecolor='#bbbbbb')
         self.PlotAllsp = self.PlotAll.add_subplot()
         self.PlotAllsp.set_facecolor('#cccccc')
 
-        self.PlotPressurePrediction = plt.Figure(figsize=(12, 6), facecolor='#bbbbbb')
-        self.PlotPressurePredictionsp = self.PlotPressurePrediction.add_subplot()
-        self.PlotPressurePredictionsp.set_facecolor('#cccccc')
+        self.PlotPrediction = plt.Figure(figsize=(12, 6), facecolor='#bbbbbb')
+        self.PlotPredictionsp = self.PlotPrediction.add_subplot()
+        self.PlotPredictionsp.set_facecolor('#cccccc')
 
-        self.PlotHumidityPrediction = plt.Figure(figsize=(12, 6), facecolor='#bbbbbb')
-        self.PlotHumidityPredictionsp = self.PlotHumidityPrediction.add_subplot()
-        self.PlotHumidityPredictionsp.set_facecolor('#cccccc')
-
-        self.PlotTemperaturePrediction = plt.Figure(figsize=(12,6), facecolor='#bbbbbb')
-        self.PlotTemperaturePredictionsp = self.PlotTemperaturePrediction.add_subplot()
-        self.PlotTemperaturePredictionsp.set_facecolor('#cccccc')
-
-        self.PlotSoilMoisturePrediction = plt.Figure(figsize=(12,6), facecolor='#bbbbbb')
-        self.PlotSoilMoisturePredictionsp = self.PlotSoilMoisturePrediction.add_subplot()
-        self.PlotTemperaturePredictionsp.set_facecolor('#cccccc')
 
         self.PressureColour = '#AD0A75'
         self.HumidityColour = '#AD420A'
@@ -243,87 +238,36 @@ class DataGenandStats:
         self.DashboardTPlot.pause()
         self.DashboardSMPlot.resume()
 
-    def Time(self, Label) -> None:
-        CurrentTime = time.strftime('%H:%M:%S %p')
-        Label.config(text = CurrentTime)
-
-        Label.after(1000, self.Time)
-
-    def PressurePrediction(self, i) -> None:
-        self.PlotPressurePredictionsp.cla()
-        Px, Py = self.PressureGen()
-        Forecasting = ML.Forecasting(Px, Py)
-
-        Model = Forecasting.Modelling()
-        SequenceDataFrame = Forecasting.windowIO(10, 10, Model)
-        DTSP, GBRP, XT, YT = Forecasting.ModellingTwo(SequenceDataFrame)
-
-        self.PlotPressurePredictionsp.plot(np.arange(0, 10, 1), XT[1], 'b-', label = "Input")
-        self.PlotPressurePredictionsp.plot(np.arange(10, 21, 1), YT[1], color="blue", label = "Actual")
-        self.PlotPressurePredictionsp.plot(np.arange(10, 21, 1), DTSP[1], color="green", label="DT")
-        self.PlotPressurePredictionsp.plot(np.arange(10, 21, 1), GBRP[1], color="purple", label="GB")
-    
-    def AniPressPred(self):
-        self.PlotPressAni = FuncAnimation(self.PlotPressurePrediction, self.PressurePrediction, interval = 1000)
-    
-    def HumidityPrediction(self, i) -> None:
+    def GradCalcs(self, i) -> None:
+        self.PlotPredictionsp.cla()
         
-        self.PlotHumidityPredictionsp.cla()
-        Hx, Hy = self.HumidityGen()
+        # Calculate Gradients
         
-        Forecasting = ML.Forecasting(Hx, Hy)
+        # Change in Y
+        PresDeltaY = self.PressureY[-1] - self.PressureY[0]
+        HumiDeltaY = self.HumidityY[-1] - self.HumidityY[0]
+        TempDeltaY = self.TemperatureY[-1] - self.TemperatureY[0]
+        SoMoDeltaY = self.SoilMositureY[-1] - self.SoilMositureY[0]
+        
+        # Change In X
+        PresDeltaX = self.PressureX[-1] - self.PressureX[0]
+        HumiDeltaX = self.HumidityX[-1] - self.HumidityX[0]
+        TempDeltaX = self.TemperatureX[-1] - self.TemperatureX[0]
+        SoMoDeltaX = self.SoilMositureX[-1] - self.SoilMositureX[0]
 
-        Model = Forecasting.Modelling()
-        SequenceDataFrame = Forecasting.windowIO(10, 10, Model)
-        DTSP, GBRP, XT, YT = Forecasting.ModellingTwo(SequenceDataFrame)
-
-        self.PlotHumidityPredictionsp.plot(np.arange(0, 10, 1), XT[1], 'b-', label = "Input")
-        self.PlotHumidityPredictionsp.plot(np.arange(10, 21, 1), YT[1], color="blue", label = "Actual")
-        self.PlotHumidityPredictionsp.plot(np.arange(10, 21, 1), DTSP[1], color="green", label="DT")
-        self.PlotHumidityPredictionsp.plot(np.arange(10, 21, 1), GBRP[1], color="purple", label="GB")
+        # Gradient
+        self.PressureGrad = PresDeltaY / PresDeltaX
+        self.HumidityGrad = HumiDeltaY / HumiDeltaX
+        self.TemperatureGrad = TempDeltaY / TempDeltaX
+        self.SoilMoistureGrad = SoMoDeltaY / SoMoDeltaX
     
-    def AniHumidPred(self) -> None:
-        self.PlotHumidAni = FuncAnimation(self.PlotHumidityPrediction, self.HumidityPrediction, interval = 1000)
-    
-    def TemperaturePrediction(self, i) -> None:
-        self.PlotTemperaturePredictionsp.cla()
-        Tx, Ty = self.TemperatureGen()
-
-        Forecasting = ML.Forecasting(Tx, Ty)
-
-        Model = Forecasting.Modelling()
-        SequenceDataFrame = Forecasting.windowIO(10, 10, Model)
-        DTSP, GBRP, XT, YT = Forecasting.ModellingTwo(SequenceDataFrame)
-
-        self.PlotTemperaturePredictionsp.plot(np.arange(0, 10, 1), XT[1], 'b-', label = "Input")
-        self.PlotTemperaturePredictionsp.plot(np.arange(10, 21, 1), YT[1], color="blue", label = "Actual")
-        self.PlotTemperaturePredictionsp.plot(np.arange(10, 21, 1), DTSP[1], color="green", label="DT")
-        self.PlotTemperaturePredictionsp.plot(np.arange(10, 21, 1), GBRP[1], color="purple", label="GB")
-    
-    def AniTempPred(self) -> None:
-        self.PlotTempAni = FuncAnimation(self.PlotTemperaturePrediction, self.TemperaturePrediction, interval = 1000)
-    
-    def SoilMoisturePrediction(self, i) -> None:
-        self.PlotSoilMoisturePredictionsp.cla()
-        Sx, Sy = self.SoilMoistureGen()
-
-        Forecasting = ML.Forecasting(Sx, Sy)
-
-        Model = Forecasting.Modelling()
-        SequenceDataFrame = Forecasting.windowIO(10, 10, Model)
-        DTSP, GBRP, XT, YT = Forecasting.ModellingTwo(SequenceDataFrame)
-
-        self.PlotSoilMoisturePredictionsp.plot(np.arange(0, 10, 1), XT[1], 'b-', label = "Input")
-        self.PlotSoilMoisturePredictionsp.plot(np.arange(10, 21, 1), YT[1], color="blue", label = "Actual")
-        self.PlotSoilMoisturePredictionsp.plot(np.arange(10, 21, 1), DTSP[1], color="green", label="DT")
-        self.PlotSoilMoisturePredictionsp.plot(np.arange(10, 21, 1), GBRP[1], color="purple", label="GB")
-    
-    def AniSMPred(self) -> None:
-        self.PlotSMAni = FuncAnimation(self.PlotSoilMoisturePrediction, self.SoilMoisturePrediction, interval = 1000)
+    def AniGradCalcs(self) -> None:
+        self.AniGrad = FuncAnimation(self.PlotPrediction, self.GradCalcs, interval = 1000)
     
 
         
 def main():
+    global root
     root = tk.Tk()
     root.title("EnviroSense Module Hub")
     root.geometry('1440x720')
@@ -332,16 +276,10 @@ def main():
     # Tabs
     Tabs = ttk.Notebook(root)
     Dashboard = ttk.Frame(Tabs)
-    PressurePrediction = ttk.Frame(Tabs)
-    HumidityPrediction = ttk.Frame(Tabs)
-    TemperaturePrediction = ttk.Frame(Tabs)
-    SoilMoisturePrediction = ttk.Frame(Tabs)
+    Prediction = ttk.Frame(Tabs)
 
     Tabs.add(Dashboard, text = "Dashboard")
-    Tabs.add(PressurePrediction, text = "Pressure Prediction")
-    Tabs.add(HumidityPrediction, text = "Humidity Prediction")
-    Tabs.add(TemperaturePrediction, text = "Temperature Prediction")
-    Tabs.add(SoilMoisturePrediction, text = "Soil Mositure Prediction")
+    Tabs.add(Prediction, text = "Prediction")
     Tabs.pack(expand=1, fill="both")
 
     Data = DataGenandStats()
@@ -371,36 +309,11 @@ def main():
     
     Data.InitAnimations()
     
-    ######### Pressure Prediction
+    ######### Prediction
 
+    Data.AniGradCalcs()
 
-    PressureDisplay = FigureCanvasTkAgg(Data.PlotPressurePrediction, master = PressurePrediction)
-    PressureDisplay.get_tk_widget().place(x = 10, y = 10)
-
-    Data.AniPressPred()
-
-
-    ######### Humidity Prediction
-
-
-    HumidityDisplay = FigureCanvasTkAgg(Data.PlotHumidityPrediction, master = HumidityPrediction)
-    HumidityDisplay.get_tk_widget().place(x = 10, y = 10)
-
-    Data.AniHumidPred()
-
-    ######### Temperature Prediction
-
-    TemperatureDisplay = FigureCanvasTkAgg(Data.PlotTemperaturePrediction, master = TemperaturePrediction)
-    TemperatureDisplay.get_tk_widget().place(x = 10, y = 10)
-
-    Data.AniPressPred()
-
-    ######### Soil Moisture Prediction
-
-    SoilMoistureDisplay = FigureCanvasTkAgg(Data.PlotSoilMoisturePrediction, master = SoilMoisturePrediction)
-    SoilMoistureDisplay.get_tk_widget().place(x = 10, y = 10)
-
-    Data.AniSMPred()
+    print(str(Data.PressureGrad))
 
     root.mainloop()
 

@@ -3,14 +3,13 @@
 # Import Libraries
 import tkinter as tk
 from tkinter import ttk
-import sched, time
+import time
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
-import collections
 from tkinter.ttk import Progressbar
 import math
 
@@ -19,6 +18,7 @@ import psutil # Remove when real data is used
 
 # Related Files
 from MachineLearning.MachineLearning import *
+from ImportData import *
 #import MachineLearning.TensorflowML as TensorflowML
 #import MachineLearning.PyTorch as PyTorch
 
@@ -91,7 +91,7 @@ tabSys.add(tab2, text = 'Humidity')
 tabSys.add(tab3, text = 'Temperature')
 tabSys.add(tab4, text = 'Soil Moisture')
 tabSys.add(tab6, text = "Forecasting")
-tabSys.add(tab7, text = "Tensor")
+tabSys.add(tab7, text = "Settings")
 tabSys.pack(expand = 1, fill = "both")
 
 # Variables
@@ -104,6 +104,9 @@ xTemperature = np.ones(10)
 yTemperature = np.ones(10)
 xSoilMositure = np.ones(10)
 ySoilMoisture = np.ones(10)
+
+IMPORTEDDATA = ''
+ProcessedData = IMPORTEDDATA.split(',')
 
 def ShiftArray(Array):
     TempArray = np.ones(len(Array))
@@ -155,25 +158,6 @@ AllPlotT.set_facecolor(BkgndClr_Graphs)
 AllPlotSM = plt.subplot(224)
 AllPlotSM.set_facecolor(BkgndClr_Graphs)
 
-
-# Testing Forecasting Plot
-FigureForecast = plt.figure(figsize=(12, 6), facecolor=BkgndClr)
-ForecastPressure = plt.subplot(221)
-ForecastPressure.set_facecolor(BkgndClr_Graphs)
-
-ForecastHumidity = plt.subplot(222)
-ForecastHumidity.set_facecolor(BkgndClr_Graphs)
-
-ForecastTemperature = plt.subplot(223)
-ForecastTemperature.set_facecolor(BkgndClr_Graphs)
-
-ForecastSoilMoisture = plt.subplot(224)
-ForecastSoilMoisture.set_facecolor(BkgndClr_Graphs)
-
-# TensorFlowTesting
-FigureTensor = plt.figure(figsize=(12, 6))
-FigureTensorSub = plt.subplot(111)
-
 # ========================================================================================
 # Allow for MatplotLib Graphing
 # ========================================================================================
@@ -193,10 +177,6 @@ Tab3Display.get_tk_widget().pack()
 Tab4Display = FigureCanvasTkAgg(FigureSM, master=tab4)
 Tab4Display.get_tk_widget().pack()
 
-Tab6Display = FigureCanvasTkAgg(FigureForecast, master=tab6)
-Tab6Display.get_tk_widget().pack()
-
-Tab7Display = FigureCanvasTkAgg(FigureTensor, master=tab7)
 
 # ========================================================================================
 # Functions
@@ -211,7 +191,6 @@ PressureLabel.pack()
 def DataGenPressure(i):
     AllPlotP.cla()
     PressurePlot.cla()
-    ForecastPressure.cla()
    
     global xPres
     global yPres
@@ -220,6 +199,7 @@ def DataGenPressure(i):
     yPres = ShiftArray(yPres)
 
     xPres[-1] = time.time()-StartTime
+    #yPres[-1] = float(ProcessedData[0])
     yPres[-1] = psutil.cpu_percent()
 
     PressurePlot.plot(xPres, yPres, color= Pressure_LineClr)
@@ -229,12 +209,7 @@ def DataGenPressure(i):
     AllPlotP.plot(xPres, yPres, color= Pressure_LineClr)
     AllPlotP.set_title("Pressure")
 
-    # Machine Learning (Regression)
-
-    PredX, PredY, Grad = PressureRegression(xPres, yPres)
-
-    ForecastPressure.plot(PredX, PredY)
-    ForecastPressure.set_title("Future Pressure")
+    
 
 
 
@@ -256,6 +231,7 @@ def DataGenHumidity(i):
     yHumidity = ShiftArray(yHumidity)
 
     xHumidity[-1] = time.time() - StartTime
+    #yTempVal = float(ProcessedData[1])
     yTempVal = psutil.virtual_memory().percent
     yHumidity[-1] = yTempVal
 
@@ -282,6 +258,7 @@ def DataGenTemperature(i):
     yTemperature = ShiftArray(yTemperature)
 
     xTemperature[-1] = time.time() - StartTime
+    #yTemperature[-1] = float(ProcessedData[2])
     yTemperature[-1] = psutil.cpu_percent()
 
     TemperatureLabel.config(text=str(yTemperature[-1]))
@@ -308,6 +285,7 @@ def DataGenSoilMoisture(i):
     ySoilMoisture = ShiftArray(ySoilMoisture)
 
     xSoilMositure[-1] = time.time() - StartTime
+    #ySoilMoisture[-1] = float(ProcessedData[3])
     ySoilMoisture[-1] = psutil.virtual_memory().percent
 
     SoilMoistureLabel.config(text=str(ySoilMoisture[-1]))
@@ -364,29 +342,140 @@ def UpdateLabels():
 UpdateLabels()
 
 # ========================================================================================
-# Machine Learning
+# Weather Prediction
 # ========================================================================================
 
-def PressureRegression(xPres, yPres):
+# Master is tab6
 
-    # Initialise the Prediction
-    PressureRegression = Predict(xPres, yPres)
+OverallPrediction = tk.Label(tab6, text = "")
+OverallPrediction.place(x = 100, y = 100)
 
-    RegLine, Coeff, C , Grad = PressureRegression.TrainModel()
+def CheckGradients(PG, HG, TG, SMG):
+    array = [PG, HG, TG, SMG]
+    GradArray = ['','','','']
 
-    Next10XVals = np.ones(10)
+    if PG > 0:
+        GradArray[0] = 'POS'
+    elif PG == 0:
+        GradArray[0] = 'NEU'
+    else:
+        GradArray[0] = 'NEG'
 
-    for i in range(10):
-        if i == 0:
-            Next10XVals[i] = xPres[-1] + 1
-        else:
-            Next10XVals[i] = Next10XVals[i - 1] + 1
+    if HG > 0:
+        GradArray[1] = 'POS'
+    elif HG == 0:
+        GradArray[1] = 'NEU'
+    else:
+        GradArray[1] = 'NEG'
+
+    if TG > 0:
+        GradArray[2] = 'POS'
+    elif TG == 0:
+        GradArray[2] = 'NEU'
+    else:
+        GradArray[2] = 'NEG'
+
+    if SMG > 0:
+        GradArray[3] = 'POS'
+    elif SMG == 0:
+        GradArray[3] = 'NEU'
+    else:
+        GradArray[3] = 'NEG'
+
     
-    PredictedY = PressureRegression.PredictArray(Next10XVals)
+    return GradArray
 
-    return Next10XVals, PredictedY, Grad
+def FindGradients():
+    # DeltaX, DeltaY
+
+    global xPres, yPres, xHumidity, yHumidity, xTemperature, yTemperature, xSoilMositure, ySoilMoisture
+
+    PressureDeltaX = xPres[-1] - xPres[0]
+    PressureDeltaY = yPres[-1] - yPres[0]
+    if PressureDeltaX == 0.0:
+        PressureGradient = 0.0
+    else:
+        PressureGradient = PressureDeltaY / PressureDeltaX
+
+    HumidityDeltaX = xHumidity[-1] - xHumidity[0]
+    HumidityDeltaY = yHumidity[-1] - xHumidity[0]
+    if HumidityDeltaX == 0.0:
+        HumidityGradient = 0.0
+    else:  
+        HumidityGradient = HumidityDeltaY / HumidityDeltaX
+
+    TemperatureDeltaX = xTemperature[-1] - xTemperature[0]
+    TemperatureDeltaY = yTemperature[-1] - yTemperature[0]
+    if TemperatureDeltaX == 0.0:
+        TemperatureGradient = 0.0
+    else:
+        TemperatureGradient = TemperatureDeltaY / TemperatureDeltaX
+
+    SoilMoistureDeltaX = xSoilMositure[-1] - xSoilMositure[0]
+    SoilMoistureDeltaY = ySoilMoisture[-1] - ySoilMoisture[0]
+    if SoilMoistureDeltaX == 0.0:
+        SoilMoistureGraient = 0.0
+    else:
+        SoilMoistureGraient = SoilMoistureDeltaY / SoilMoistureDeltaX
+
+    Gradients = CheckGradients(PressureGradient, HumidityGradient, TemperatureGradient, SoilMoistureGraient)
+
+
+    # [0] = Pressure, [1] = Humidity, [2] = Temperature, [3] = Soil Moisture
+    #       NEG             POS                                POS           Rainfall
+    #       POS                             POS                NEU/NEG       Sunshine
+    #       NC              NC              NC                 POS           Watering of Soil
+
+    if ((Gradients[0] == 'NEG') and (Gradients[1] == 'POS') and (Gradients[3] == 'POS')):
+        OverallPrediction.config(text = "Rainfall is Occuring or will Occur")
+    elif ((Gradients[0] == 'POS') and (Gradients[2] == 'POS') and ((Gradients[3] == 'NEU') or (Gradients[3] == 'NEG'))):
+        OverallPrediction.config(text = "Sunshine is Occuring or will Occur")
+    elif (Gradients[3] == 'POS'):
+        OverallPrediction.config(text = "Soil is being watered")
+    
+
+    OverallPrediction.after(1000, FindGradients)
+
+FindGradients()
+
+
+# ========================================================================================
+# Settings
+# ========================================================================================
+
+# tab7
+EnterCOMPort = tk.Text(tab7, height=2, width=20)
+EnterCOMPort.place(x = 100, y = 20)
+EnterBaudRate = tk.Text(tab7, height=2, width=20)
+EnterBaudRate.place(x = 100, y = 40)
+COMPort = ''
+BaudRate = 0
+
+
+def GetCOMPort():
+    global COMPort
+    COMPort = EnterCOMPort.get("1.0", "end")
+    print(COMPort)
+
+def GetBaudRate():
+    global BaudRate
+    BaudRate = EnterBaudRate.get("1.0", "end")
+    print(BaudRate)
+
+def StartCOMS():
+    global COMPort, BaudRate
+    SysData = GetData(COMPort, BaudRate)
+
+    SysData.StartConnection()
+    print("Starting COMs")
 
 
 
+SubmitCOMPort = tk.Button(tab7, text="Submit", command=GetCOMPort)
+SubmitCOMPort.place(x=280, y=20)
+SubmitBaudRate = tk.Button(tab7, text = "Submit", command=GetBaudRate)
+SubmitBaudRate.place(x=280, y=40)
+StartButton = tk.Button(tab7, text = "Start Connection", command=StartCOMS)
+StartButton.place(x = 300, y = 300)
 
 root.mainloop()

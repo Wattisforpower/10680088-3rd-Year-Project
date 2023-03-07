@@ -1,8 +1,6 @@
 #include "mbed.h"
-#include <cstdio>
-#include <iostream>
+#include "sensorread.h"
 #include "stdio.h"
-#include "sensorread.cpp"
 
 // The following is used to mitage the errors given about the following missing
 extern "C"{
@@ -50,7 +48,8 @@ extern "C"{
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AnalogIn SM(A6);
+SensorRead Sensors;
+
 I2C BME280(D4, D5);
 
 const int addr8bit = 0x76 << 1;
@@ -60,11 +59,13 @@ int main()
 {
 
     while (true) {
-        int data = SM.read_u16();
+        Sensors.SoilMoistureSensor();
+        Sensors.BME280();
+        string Result = Sensors.ReturnData();
 
-        printf("Data: %d \n", data);
+        printf("%s \n", Result.c_str());
 
-        wait_us(1000);
+        wait_us(1000000);
     }
 
     return 0;

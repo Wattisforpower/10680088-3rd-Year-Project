@@ -105,9 +105,6 @@ yTemperature = np.ones(10)
 xSoilMositure = np.ones(10)
 ySoilMoisture = np.ones(10)
 
-IMPORTEDDATA = ''
-ProcessedData = IMPORTEDDATA.split(',')
-
 def ShiftArray(Array):
     TempArray = np.ones(len(Array))
 
@@ -188,19 +185,41 @@ PressureTitleLabel = tk.Label(tab1, text="Pressure: ").pack()
 PressureLabel = tk.Label(tab1, text="")
 PressureLabel.pack()
 
+NullLabel = tk.Label(tab7)
+ProcessedData = ['0.0', '0.0', '0.0', '0.0']
+
+def RetrieveData():
+    global SysData
+    global ProcessedData
+    res = SysData.readConnection()
+    resString = str(res)
+    # Remove \r\n
+    resString = resString[:-5]
+    # Remove b'
+    resString = resString[2:]
+
+    print(resString)
+    ProcessedData = resString.split(',')
+    print(ProcessedData)
+
+    NullLabel.after(1000, RetrieveData)
+
+
 def DataGenPressure(i):
     AllPlotP.cla()
     PressurePlot.cla()
    
     global xPres
     global yPres
+    global ProcessedData
 
     xPres = ShiftArray(xPres)
     yPres = ShiftArray(yPres)
 
     xPres[-1] = time.time()-StartTime
-    #yPres[-1] = float(ProcessedData[0])
-    yPres[-1] = psutil.cpu_percent()
+    yPres[-1] = float(ProcessedData[0])
+    #yPres[-1] = psutil.cpu_percent()
+    print(yPres[-1])
 
     PressurePlot.plot(xPres, yPres, color= Pressure_LineClr)
     PressurePlot.set_title("Pressure")
@@ -231,8 +250,8 @@ def DataGenHumidity(i):
     yHumidity = ShiftArray(yHumidity)
 
     xHumidity[-1] = time.time() - StartTime
-    #yTempVal = float(ProcessedData[1])
-    yTempVal = psutil.virtual_memory().percent
+    yTempVal = float(ProcessedData[1])
+    #yTempVal = psutil.virtual_memory().percent
     yHumidity[-1] = yTempVal
 
     HumidityPlot.plot(xHumidity, yHumidity, color = Humidity_LineClr)
@@ -258,8 +277,8 @@ def DataGenTemperature(i):
     yTemperature = ShiftArray(yTemperature)
 
     xTemperature[-1] = time.time() - StartTime
-    #yTemperature[-1] = float(ProcessedData[2])
-    yTemperature[-1] = psutil.cpu_percent()
+    yTemperature[-1] = float(ProcessedData[2])
+    #yTemperature[-1] = psutil.cpu_percent()
 
     TemperatureLabel.config(text=str(yTemperature[-1]))
     TemperaturePlot.plot(xTemperature, yTemperature, color = Temp_LineClr)
@@ -285,8 +304,8 @@ def DataGenSoilMoisture(i):
     ySoilMoisture = ShiftArray(ySoilMoisture)
 
     xSoilMositure[-1] = time.time() - StartTime
-    #ySoilMoisture[-1] = float(ProcessedData[3])
-    ySoilMoisture[-1] = psutil.virtual_memory().percent
+    ySoilMoisture[-1] = float(ProcessedData[3])
+    #ySoilMoisture[-1] = psutil.virtual_memory().percent
 
     SoilMoistureLabel.config(text=str(ySoilMoisture[-1]))
     SoilMoisturePlot.plot(xSoilMositure, ySoilMoisture, SoilMoisture_LineClr)
@@ -432,6 +451,8 @@ def FindGradients():
         OverallPrediction.config(text = "Sunshine is Occuring or will Occur")
     elif (Gradients[3] == 'POS'):
         OverallPrediction.config(text = "Soil is being watered")
+    elif((Gradients[0] == 'NEU') and (Gradients[1] == 'NEU') and (Gradients[2] == 'NEU') and (Gradients[3] == 'NEU')):
+        OverallPrediction.config(text = "TESTING!!!")
     
 
     OverallPrediction.after(1000, FindGradients)
@@ -456,6 +477,7 @@ def GetCOMPort():
     global COMPort
     COMPort = EnterCOMPort.get("1.0", "end")
     print(COMPort)
+    COMPort = COMPort.strip('\n')
 
 def GetBaudRate():
     global BaudRate
@@ -464,16 +486,19 @@ def GetBaudRate():
 
 def StartCOMS():
     global COMPort, BaudRate
+    global SysData
     SysData = GetData(COMPort, BaudRate)
 
     SysData.StartConnection()
     print("Starting COMs")
 
+    RetrieveData()
 
 
-SubmitCOMPort = tk.Button(tab7, text="Submit", command=GetCOMPort)
+
+SubmitCOMPort = tk.Button(tab7, text="Submit Port", command=GetCOMPort)
 SubmitCOMPort.place(x=280, y=20)
-SubmitBaudRate = tk.Button(tab7, text = "Submit", command=GetBaudRate)
+SubmitBaudRate = tk.Button(tab7, text = "Submit BaudRate", command=GetBaudRate)
 SubmitBaudRate.place(x=280, y=40)
 StartButton = tk.Button(tab7, text = "Start Connection", command=StartCOMS)
 StartButton.place(x = 300, y = 300)

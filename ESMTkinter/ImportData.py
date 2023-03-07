@@ -11,10 +11,15 @@ class GetData:
         self.BaudRate = BaudRate
     
     def StartConnection(self) -> None:
-        self.COMMS = serial.Serial(self.COMPort, self.BaudRate, timeout=0, parity=serial.PARITY_EVEN, rtscts=1)
+        self.COMMS = serial.Serial(self.COMPort, self.BaudRate)
+        try:
+            self.COMMS.open()
+        except IOError:
+            self.COMMS.close()
+            self.COMMS.open()
     
     def readConnection(self) -> str:
-        self.result = self.COMMS.read_all()
+        self.result = self.COMMS.readline()
         return self.result
     
     

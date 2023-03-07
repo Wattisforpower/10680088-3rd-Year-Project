@@ -5,13 +5,10 @@
 #include "mbed.h"
 
 // Correct These to their actual values
-#define BMESDAPin PA_10
-#define BMESCLPin PA_9
+#define BMESDAPin D4
+#define BMESCLPin D5
 
-#define TMPSDAPin PB_4
-#define TMPSCLPin PA_7
-
-#define SoilMoisturePin PA_0
+#define SoilMoisturePin PA_7
 
 // Other Defines
 #define SIZE 10
@@ -19,10 +16,9 @@
 // Class Function
 class DataCollection{
     private:
-        float BME280Input, TMP117Input, SoilMoistureInput;
+        float BME280Input, SoilMoistureInput;
         // Address for the I2C Device buses
         const int BMEAddr = 0x76;
-        const int TMPAddr = 0x48;
 
         // Buffers
         float AntiSampleJittering[SIZE];
@@ -32,7 +28,6 @@ class DataCollection{
         // Value Structure
         typedef struct {
             float BME;
-            float TMP;
             float SM;
         } Values;
 
@@ -40,14 +35,13 @@ class DataCollection{
         DataCollection::Values AvgResult;
 
         // Constructor
-        DataCollection();
 
         // Functions
         void BME280RecieveData();
-        void TMP117RecieveData();
         void SoilMoistureRecieveData();
         float RollingAverage(float InputVal);
-        DataCollection::Values ReturnValues();        
+        DataCollection::Values ReturnValues();
+        void REBOOT();      
 };
 
 #endif /* _DataCollection_H */

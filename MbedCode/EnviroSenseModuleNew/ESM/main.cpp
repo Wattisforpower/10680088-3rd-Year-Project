@@ -1,6 +1,8 @@
-// Libraries
 #include "mbed.h"
+#include <cstdio>
 #include <iostream>
+#include "stdio.h"
+#include "sensorread.cpp"
 
 // The following is used to mitage the errors given about the following missing
 extern "C"{
@@ -45,53 +47,26 @@ extern "C"{
    long long int wcstoll (const wchar_t* str, wchar_t** endptr, int base){return 0;}
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// MAIN CODE
-////////////////////////////////////////////////////////////////////////////////
 
-// Namespaces
-using namespace std;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Headers
-#include "DataCollection.hpp"
+AnalogIn SM(A6);
+I2C BME280(D4, D5);
 
-// Threads
-Thread Thread_DataAquisition;
+const int addr8bit = 0x76 << 1;
 
-// Queues
-EventQueue EQ_DataAquisition(1 * EVENTS_QUEUE_SIZE);
-
-// Classes
-DataCollection Data;
-
-// Function Prototypes
-void DataAquisition();
-
+// main() runs in its own thread in the OS
 int main()
 {
-    EQ_DataAquisition.call_every(1s, DataAquisition); // change to a suitable time after testing
-
-    Thread_DataAquisition.start(callback(&EQ_DataAquisition, &EventQueue::dispatch_forever));
-    
 
     while (true) {
-        sleep();
+        int data = SM.read_u16();
+
+        printf("Data: %d \n", data);
+
+        wait_us(1000);
     }
+
+    return 0;
 }
 
-// Thread Functions
-
-void DataAquisition(){
-    // Recieve Data
-    Data.BME280RecieveData();
-    Data.SoilMoistureRecieveData();
-
-    // Recieve Values for Rolling Average
-    DataCollection::Values InVals;
-    InVals = Data.ReturnValues();
-    // Rolling Average
-    Data.AvgResult.BME = Data.RollingAverage(InVals.BME);
-    Data.AvgResult.SM  = Data.RollingAverage(InVals.SM);
-
-    cout << InVals.SM << " | " << Data.AvgResult.SM << endl;
-}

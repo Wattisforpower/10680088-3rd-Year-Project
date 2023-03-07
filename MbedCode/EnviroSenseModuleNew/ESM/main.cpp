@@ -49,8 +49,7 @@ extern "C"{
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 SensorRead Sensors;
-
-I2C BME280(D4, D5);
+UnbufferedSerial LoRa(D1, D0);
 
 const int addr8bit = 0x76 << 1;
 
@@ -64,6 +63,7 @@ int main()
         string Result = Sensors.ReturnData();
 
         printf("%s \n", Result.c_str());
+        LoRa.write(Result.c_str(), sizeof(Result));
 
         wait_us(1000000);
     }

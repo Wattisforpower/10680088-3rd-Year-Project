@@ -53,17 +53,47 @@ UnbufferedSerial LoRa(D1, D0);
 
 const int addr8bit = 0x76 << 1;
 
+string startconfig = "AT+ID";
+string DevEUIConfig = "AT+ID=DevEui,\"70B3D57ED005B532\"";
+string AppEUIConfig = "AT+ID=AppEui,\"1032487667882900\"";
+string Appkeyconfig = "AT+KEY=APPSKEY\"82551E669684E1EEA0844C6F0D2E11E4\"";
+string PortConfig = "AT+PORT=125";
+string LocConfig = "AT+DR=EU868";
+string JoinConfig = "AT+JOIN";
+
 // main() runs in its own thread in the OS
 int main()
 {
+    LoRa.write(startconfig.c_str(), sizeof(startconfig.c_str()));
+    wait_us(1000);
+    LoRa.write(DevEUIConfig.c_str(), sizeof(DevEUIConfig.c_str()));
+    wait_us(1000);
+    LoRa.write(AppEUIConfig.c_str(), sizeof(AppEUIConfig.c_str()));
+    wait_us(1000);
+    LoRa.write(Appkeyconfig.c_str(), sizeof(Appkeyconfig.c_str()));
+    wait_us(1000);
+    LoRa.write(PortConfig.c_str(), sizeof(PortConfig.c_str()));
+    wait_us(1000);
+    LoRa.write(LocConfig.c_str(), sizeof(LocConfig.c_str()));
+    wait_us(1000);
+    LoRa.write(JoinConfig.c_str(), sizeof(JoinConfig.c_str()));
+    wait_us(1000);
+
+    char* temp;
 
     while (true) {
         Sensors.SoilMoistureSensor();
         Sensors.BME280();
         string Result = Sensors.ReturnData();
 
-        printf("%s \n", Result.c_str());
-        LoRa.write(Result.c_str(), sizeof(Result));
+        //printf("%s \n", Result.c_str());
+        string send = "AT+MSG=\"" + Result + "\"";
+        
+        printf("%s \n", send.c_str());
+        LoRa.write(send.c_str(), sizeof(send.c_str()));
+        wait_us(1000);
+
+
 
         wait_us(1000000);
     }

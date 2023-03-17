@@ -117,6 +117,7 @@ int main()
     if (ATSendCheckResponse("+AT: OK", 100, "AT\r\n")){
         Exists = true;
         ATSendCheckResponse("+ID: AppEUI", 1000, "AT+ID\r\n");
+        wait_us(200000);
     }
 
     while (true) {
@@ -125,7 +126,7 @@ int main()
         Sensors.BME280();
         string Result = Sensors.ReturnData();
 
-        //printf("%s \n", Result.c_str());
+        printf("%s \n", Result.c_str());
         /*
         string send = "AT+TEST=TXLRSTR,\"" + Result + "\"\r\n";
         

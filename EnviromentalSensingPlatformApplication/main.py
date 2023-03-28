@@ -172,13 +172,26 @@ def PressureData(i):
     xPres = ShiftArray(xPres)
     yPres = ShiftArray(yPres)
 
-    xPres = time.time() - StartTime
+    xPres[-1] = time.time() - StartTime
     yPres[-1] = float(ProcessedData[0])
 
     PFig.plot(xPres, yPres)
 
+def HumidityData(i):
+    global xHumidity, yHumidity
+    global ProcessedData
+
+    xHumidity = ShiftArray(xHumidity)
+    yHumidity = ShiftArray(yHumidity)
+
+    xHumidity[-1] = time.time() - StartTime
+    yHumidity[-1] = float(ProcessedData[[1]])
+
+    HFig.plot(xHumidity, yHumidity)
+
 def Funcs(i):
     PressureData(i)
+    HumidityData(i)
 
 PressureAni = FuncAnimation(AllFigures, Funcs, interval = 1000)
 

@@ -13,10 +13,12 @@ class SensorRead{
         long BMEPres, BMEHumid, BMETemp;
 
     public:
+        string Pressure, Humidity, Temperature, SoilMoisture;
         void initializeBME280();
         void SoilMoistureSensor();
         void BME280();
         string ReturnData();
+        void AppendData();
 };
 
 #endif

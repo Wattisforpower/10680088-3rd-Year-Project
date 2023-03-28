@@ -25,6 +25,13 @@ string SensorRead::ReturnData(){
     string BMETemperature =   to_string(this->BMETemp);
     string SoilMoisture =   to_string(this->SoilMositurePercentage);
 
-    string CombinedString =  BMEPressure + "," + BMEHumidity + "," + BMETemperature + "," + SoilMoisture;
+    string CombinedString =  BMEPressure + "," + BMEHumidity + "," + BMETemperature + "," + SoilMoisture + "\r\n";
     return CombinedString;
+}
+
+void SensorRead::AppendData(){
+    this->Pressure = to_string(this->BMEPres);
+    this->Humidity = to_string(this->BMEHumid);
+    this->Temperature = to_string(this->BMETemp);
+    this->SoilMoisture = to_string(this->SoilMositurePercentage);
 }

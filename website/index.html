@@ -6,10 +6,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EnviroSense Platform</title>
 
+    <link rel="stylesheet" href="styles.css">
+
     <!--Links for additional libraries-->
-    <script src=""https://ajax.googleapis.com/ajax/libs/3.4.1/jquery.min.js></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+    <!--High CHART LIVE  -->
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/highcharts-more.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+    <!--Gauge  -->
+    <script type="text/javascript" src="http://pubnub.github.io/eon/lib/eon.js"></script>
 </head>
 <body>
-        
+    <section class="header">
+        <h1 class="Title">Welcome to the Envirosense Platform Data Dashboard</h1>
+    </section>
+    <hr>
+
+    <div class="data">
+        <div class="row">
+            <h2 class="Sensor1">Pressure: </h2>
+        </div>
+        <br>
+        <div class="row">
+            <h2 class="Sensor2">Humidity: </h2>
+        </div>
+        <br>
+        <div class="row">
+            <h2 class="Sensor3">Temperature: </h2>
+        </div>
+        <br>
+    </div>
+
 </body>
 </html>

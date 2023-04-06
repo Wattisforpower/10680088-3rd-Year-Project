@@ -15,7 +15,7 @@ def data():
     Temperature = random.random() * 100
     Humidity = random.random() * 55
 
-    data = [time() * 1000, Pressure, Temperature, Humidity]
+    data = [time() * 1000, Pressure, Humidity, Temperature]
 
     response = make_response(json.dumps(data))
 
@@ -23,5 +23,4 @@ def data():
 
     return response
 
-if __name__ == "__main__":
-    main();
+main()

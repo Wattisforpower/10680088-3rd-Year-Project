@@ -1,14 +1,13 @@
 #include "mbed.h"
 #include "sensorread.h"
 #include "stdio.h"
-#include "lorawan/LoRaWANInterface.h"
-#include "lorawan/system/lorawan_data_structures.h"
 #include <cstdarg>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <memory>
 #include "LoRa.h"
+#include "leds.h"
 
 // The following is used to mitage the errors given about the following missing
 extern "C"{
@@ -57,14 +56,39 @@ extern "C"{
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// INTERVALTIME
+#define INTERVALTIME 1s
+
+
+// Classes
 SensorRead Sensors;
 LoRa DataSend;
+led led;
 
+// Misc
 bool Is_Exist = false;
+
+// Threads
+Thread Data;
+Thread Comms;
+
+// Mutex
+Mutex DataProtection;
+
+// Function Prototypes
+void DataThread();
+void CommsThread();
 
 // main() runs in its own thread in the OS
 int main()
 {
+    led.PowerOn();
+
+    Data.start(DataThread);
+    wait_us(1000); // wait 1 millisecond before starting the next thread
+    Comms.start(CommsThread);
+
+    /*
     while (true) {
         Sensors.SoilMoistureSensor();
         Sensors.BME280();
@@ -76,6 +100,35 @@ int main()
         printf("%s \n", Result.c_str());
         wait_us(1000000); // 1s
     }
-
+    */
     return 0;
+}
+
+
+//////////////////////////////////////
+/// Thread Operations
+//////////////////////////////////////
+
+void DataThread(){
+    while (true) {
+        DataProtection.lock();
+        Sensors.SoilMoistureSensor();
+        Sensors.BME280();
+        DataProtection.unlock();
+
+        ThisThread::sleep_for(INTERVALTIME);
+    }
+}
+
+void CommsThread(){
+    while (true){
+        DataProtection.trylock();
+        string Result = Sensors.ReturnData();
+        DataSend.Send(Result);
+        printf("%s \n", Result.c_str());
+        led.Communication();
+        DataProtection.unlock();
+
+        ThisThread::sleep_for(INTERVALTIME);
+    }
 }

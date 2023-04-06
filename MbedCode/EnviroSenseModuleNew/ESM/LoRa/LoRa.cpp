@@ -145,10 +145,11 @@ void LoRa::NodeSendThenRecv(uint32_t timeout){
 void LoRa::Send(string data){
     memset(this->Buffer, 0, sizeof(this->Buffer));
     
-    sprintf(this->Buffer, "%s", data.c_str());
+    sprintf(this->Buffer, "%s\r\n", data.c_str());
 
     EndNode.write(this->Buffer, sizeof(Buffer));
 }
+
 
 void LoRa::Recieve(){
     EndNode.read(this->Buffer, sizeof(this->Buffer));

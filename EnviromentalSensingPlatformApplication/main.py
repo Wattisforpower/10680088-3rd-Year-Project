@@ -34,11 +34,6 @@ ProcessedData = ['0.0', '0.0', '0.0', '0.0']
 
 TimeBetweenchecks = 1000 #ms
 
-RegressPressure = ML.Predict(xPres, yPres)
-RegressHumidity = ML.Predict(xHumidity, yHumidity)
-RegressTemperature = ML.Predict(xTemperature, yTemperature)
-RegressSoilMoisture = ML.Predict(xSoilMoisture, ySoilMoisture)
-
 RegressedPressure = np.ones(10)
 RegressedHumidity = np.ones(10)
 RegressedTemperature = np.ones(10)
@@ -300,10 +295,11 @@ def FindGradients():
     #       NEG             POS                                POS           Rainfall
     #       POS                             POS                NEU/NEG       Sunshine
     #       NC              NC              NC                 POS           Watering of Soil
+    #       NC              NC              NC                 NEU/NEG       Sunshine
 
     if ((Gradients[0] == 'NEG') and (Gradients[1] == 'POS') and (Gradients[3] == 'POS')):
         OverallPrediction.config(text = "Rainfall is Occuring or will Occur")
-    elif ((Gradients[0] == 'POS') and (Gradients[2] == 'POS') and ((Gradients[3] == 'NEU') or (Gradients[3] == 'NEG'))):
+    elif (((Gradients[0] == 'POS') and (Gradients[2] == 'POS') and ((Gradients[3] == 'NEU') or (Gradients[3] == 'NEG'))) or ((Gradients[3] == 'NEU') or (Gradients[3] == 'NEG'))):
         OverallPrediction.config(text = "Sunshine is Occuring or will Occur")
     elif (Gradients[3] == 'POS'):
         OverallPrediction.config(text = "Soil is being watered")
@@ -321,6 +317,11 @@ def Regress():
     global PressurePlotting, HumidityPlotting, TemperaturePlotting, SoilMoisturePlotting
     global xPres, xHumidity, xTemperature, xSoilMoisture
     global PB0, PB1, HB0, HB1, TB0, TB1, SB0, SB1
+
+    RegressPressure = ML.Predict(xPres, yPres)
+    RegressHumidity = ML.Predict(xHumidity, yHumidity)
+    RegressTemperature = ML.Predict(xTemperature, yTemperature)
+    RegressSoilMoisture = ML.Predict(xSoilMoisture, ySoilMoisture)  
     
     # Train Models
     j1 , j2 , PB0, PB1 = RegressPressure.TrainModel()
@@ -346,13 +347,16 @@ def Regress():
     RegressedTemperature = RegressTemperature.PredictArray(TemperaturePlotting)
     RegressedSoilMoisture = RegressSoilMoisture.PredictArray(SoilMoisturePlotting)
 
+
+    print(RegressedPressure)
+
 def Funcs():
     PressureData()
     HumidityData()
     TemperatureData()
     SoilMoistureData()
 
-    Regress()
+    #Regress()
 
     HiddenLabel.after(TimeBetweenchecks, Funcs)
 

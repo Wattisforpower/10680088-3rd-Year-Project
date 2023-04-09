@@ -15,7 +15,7 @@ class Predict:
         B1Denominator = ((self.x - XMean)**2).sum()
         B1 = B1Numerator / B1Denominator
 
-        B0 = YMean + (B1*XMean)
+        B0 = YMean - (B1*XMean)
 
         regressionLine = f'y = {B0} + {round(B1, 3)}'
 

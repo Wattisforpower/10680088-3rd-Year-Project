@@ -15,6 +15,7 @@ void LoRa::Initialise(){
     );
 }
 
+/*
 int LoRa::CheckResponse(string acknowledgement, int timeout, string command){
     int index = 0;
     int startMillis = 0;
@@ -141,6 +142,8 @@ void LoRa::NodeSendThenRecv(uint32_t timeout){
     }
     printf("\r\n");
 }
+
+*/
 
 void LoRa::Send(string data){
     memset(this->Buffer, 0, sizeof(this->Buffer));

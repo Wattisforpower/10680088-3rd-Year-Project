@@ -57,7 +57,7 @@ extern "C"{
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // INTERVALTIME
-#define INTERVALTIME 1s
+#define INTERVALTIME 1s // Testing @1s actual 600s (10mins)
 
 
 // Classes
@@ -78,11 +78,13 @@ Mutex DataProtection;
 // Function Prototypes
 void DataThread();
 void CommsThread();
+void TriggerWatchdog();
 
 // main() runs in its own thread in the OS
 int main()
 {
     led.PowerOn();
+    DataSend.Initialise();
 
     Data.start(DataThread);
     wait_us(1000); // wait 1 millisecond before starting the next thread

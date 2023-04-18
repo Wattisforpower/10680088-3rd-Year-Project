@@ -90,6 +90,10 @@ int main()
     wait_us(1000); // wait 1 millisecond before starting the next thread
     Comms.start(CommsThread);
 
+    while (true){
+        sleep();
+    }
+
     /*
     while (true) {
         Sensors.SoilMoistureSensor();

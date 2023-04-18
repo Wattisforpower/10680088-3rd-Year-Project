@@ -221,6 +221,7 @@ def SoilMoistureData():
     xSoilMoisture[-1] = time.time() - StartTime
     ySoilMoisture[-1] = float(ProcessedData[3])
 
+
 def CheckGradients(PG, HG, TG, SMG):
     array = [PG, HG, TG, SMG]
     GradArray = ['','','','']
@@ -257,7 +258,7 @@ def CheckGradients(PG, HG, TG, SMG):
 
 def FindGradients():
     # DeltaX, DeltaY
-
+    Testing = 0
     global xPres, yPres, xHumidity, yHumidity, xTemperature, yTemperature, xSoilMoisture, ySoilMoisture
 
     PressureDeltaX = xPres[-1] - xPres[0]
@@ -292,24 +293,89 @@ def FindGradients():
 
 
     # [0] = Pressure, [1] = Humidity, [2] = Temperature, [3] = Soil Moisture
-    #       NEG             POS                                POS           Rainfall
-    #       POS                             POS                NEU/NEG       Sunshine
-    #       NC              NC              NC                 POS           Watering of Soil
-    #       NC              NC              NC                 NEU/NEG       Sunshine
+    #       NEG             POS             NC                  POS             Rainfall                        Test1
+    #       POS             NC              POS                 NEU/NEG         Sunshine                        Test2
+    #       NC              NC              NC                  POS             Watering of Soil                Test3
+    #       NC              NC              NC                  NEU/NEG         Sunshine                        Test2 (4)
+    #       NEG             NEG             NEG                 NEG             Rainfall                        Test5
+    #       NEG             NEG             NEG                 POS             Rainfall                        Test6
+    #       NEG             NEG             POS                 NEG             Rainfall                        Test7
+    #       NEG             POS             NEG                 NEG             Rainfall                        Test8
+    #       POS             NEG             NEG                 NEG             Rainfall                        Test9
+    #       NEG             NEG             POS                 POS             Rainfall                        Test10
+    #       NEG             POS             NEG                 POS             Rainfall                        Test11
+    #       POS             NEG             NEG                 POS             Watering of Soil                Test12
+    #       NEG             POS             POS                 NEG             Rainfall                        Test13
+    #       POS             NEG             POS                 NEG             Sunshine                        Test14
+    #       POS             POS             NEG                 NEG             Sunshine                        Test15
+    #       NEG             POS             POS                 POS             Rainfall                        Test16
+    #       POS             NEG             POS                 POS             Sunshine/Watering of Soil       Test17
+    #       POS             POS             NEG                 POS             Sunshine                        Test18
+    #       POS             POS             POS                 NEG             Sunshine                        Test19
+    #       POS             POS             POS                 POS             Sunshine/Watering of Soil       Test20
+    #       NEU             NEU             NEU                 NEU             TESTING                         Test21
+    #       !!!              Other combinations                 !!!             Unknown
 
-    if ((Gradients[0] == 'NEG') and (Gradients[1] == 'POS') and (Gradients[3] == 'POS')):
+    
+    if ((Gradients[0] == 'NEG') and (Gradients[1] == 'NEG') and (Gradients[2] == 'NEG') and (Gradients[3] == 'NEG')): # Test 5
         OverallPrediction.config(text = "Rainfall is Occuring or will Occur")
-    elif (((Gradients[0] == 'POS') and (Gradients[2] == 'POS') and ((Gradients[3] == 'NEU') or (Gradients[3] == 'NEG'))) or ((Gradients[3] == 'NEU') or (Gradients[3] == 'NEG'))):
-        OverallPrediction.config(text = "Sunshine is Occuring or will Occur")
-    elif (Gradients[3] == 'POS'):
+        Testing = 5
+    elif ((Gradients[0] == 'NEG') and (Gradients[1] == 'NEG') and (Gradients[2] == 'NEG') and (Gradients[3] == 'POS')): # Test 6
+        OverallPrediction.config(text = "Rainfall is Occuring or will Occur")
+        Testing = 6
+    elif ((Gradients[0] == 'NEG') and (Gradients[1] == 'NEG') and (Gradients[2] == 'POS') and (Gradients[3] == 'NEG')): # Test 7
+        OverallPrediction.config(text = "Rainfall is Occuring or will Occur")
+        Testing = 7
+    elif ((Gradients[0] == 'NEG') and (Gradients[1] == 'POS') and (Gradients[2] == 'NEG') and (Gradients[3] == 'NEG')): # Test 8
+        OverallPrediction.config(text = "Rainfall is Occuring or will Occur")
+        Testing = 8
+    elif ((Gradients[0] == 'POS') and (Gradients[1] == 'NEG') and (Gradients[2] == 'NEG') and (Gradients[3] =='NEG')): # Test 9
+        OverallPrediction.config(text = "Rainfall is Occuring or will Occur")
+        Testing = 9
+    elif ((Gradients[0] == 'NEG') and (Gradients[1] == 'NEG') and (Gradients[2] == 'POS') and (Gradients[3] == 'POS')): # Test 10
+        OverallPrediction.config(text = "Rainfall is Occuring or will Occur")
+        Testing = 10
+    elif ((Gradients[0] == 'NEG') and (Gradients[1] == 'POS') and (Gradients[2] == 'NEG') and (Gradients[3] == 'POS')): # Test 11
+        OverallPrediction.config(text = "Rainfall is Occuring or will Occur")
+        Testing = 11
+    elif ((Gradients[0] == 'POS') and (Gradients[1] == 'NEG') and (Gradients[2] == 'NEG') and (Gradients[3] == 'POS')): # Test 12
         OverallPrediction.config(text = "Soil is being watered")
-    elif((Gradients[0] == 'NEU') and (Gradients[1] == 'NEU') and (Gradients[2] == 'NEU') and (Gradients[3] == 'NEU')):
+        Testing = 12
+    elif ((Gradients[0] == 'NEG') and (Gradients[1] == 'POS') and (Gradients[2] == 'POS') and (Gradients[3] == 'NEG')): # Test 13
+        OverallPrediction.config(text = "Rainfall is Occuring or will Occur")
+        Testing = 13
+    elif ((Gradients[0] == 'POS') and (Gradients[1] == 'NEG') and (Gradients[2] == 'POS') and (Gradients[3] == 'NEG')): # Test 14
+        OverallPrediction.config(text = "Sunshine is Occuring or will Occur")
+        Testing = 14
+    elif ((Gradients[0] == 'POS') and (Gradients[1] == 'POS') and (Gradients[2] == 'NEG') and (Gradients[3] == 'NEG')): # Test 15
+        OverallPrediction.config(text = "Sunshine is Occuring or will Occur")
+        Testing = 15
+    elif ((Gradients[0] == 'NEG') and (Gradients[1] == 'POS') and (Gradients[2] == 'POS') and (Gradients[3] == 'POS')): # Test 16
+        OverallPrediction.config(text = "Rainfall is Occuring or will Occur")
+        Testing = 16
+    elif ((Gradients[0] == 'POS') and (Gradients[1] == 'NEG') and (Gradients[2] == 'POS') and (Gradients[3] == 'POS')): # Test 17
+        OverallPrediction.config(text = "Sunshine is Occuring or will Occur")
+        Testing = 17
+    elif ((Gradients[0] == 'POS') and (Gradients[1] == 'POS') and (Gradients[2] == 'NEG') and (Gradients[3] == 'NEG')): # Test 18
+        OverallPrediction.config(text = "Sunshine is Occuring or will Occur")
+        Testing = 18
+    elif ((Gradients[0] == 'POS') and (Gradients[1] == 'POS') and (Gradients[2] == 'POS') and (Gradients[3] == 'NEG')): # Test 19
+        OverallPrediction.config(text = "Sunshine is Occuring or will Occur")
+        Testing = 19
+    elif ((Gradients[0] == 'POS') and (Gradients[1] == 'POS') and (Gradients[2] == 'POS') and (Gradients[3] == 'POS')): # Test 20
+        OverallPrediction.config(text = "Sunshine is Occuring or will Occur")
+        Testing = 20
+    elif((Gradients[0] == 'NEU') and (Gradients[1] == 'NEU') and (Gradients[2] == 'NEU') and (Gradients[3] == 'NEU')): # Test 21
         OverallPrediction.config(text = "TESTING!!!")
+        Testing = 21
+    #else:
+    #    OverallPrediction.config(text = "Unknown Result - Please add to elif Ladder")
     
 
     OverallPrediction.after(1000, FindGradients)
 
 FindGradients()
+
 
 def Regress():
     global NextPressure, NextHumidity, NextTemperature, NextSoilMositure

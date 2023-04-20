@@ -65,9 +65,6 @@ SensorRead Sensors;
 LoRa DataSend;
 led led;
 
-// Misc
-bool Is_Exist = false;
-
 // Threads
 Thread Data;
 Thread Comms;
@@ -94,19 +91,6 @@ int main()
         sleep();
     }
 
-    /*
-    while (true) {
-        Sensors.SoilMoistureSensor();
-        Sensors.BME280();
-        string Result = Sensors.ReturnData();
-        //string Result = "1000,100,100,100";
-
-        DataSend.Send(Result);
-
-        printf("%s \n", Result.c_str());
-        wait_us(1000000); // 1s
-    }
-    */
     return 0;
 }
 

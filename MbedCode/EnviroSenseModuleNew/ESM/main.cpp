@@ -81,7 +81,7 @@ void TriggerWatchdog();
 int main()
 {
     led.PowerOn();
-    DataSend.Initialise();
+    //DataSend.Initialise();
 
     Data.start(DataThread);
     wait_us(1000); // wait 1 millisecond before starting the next thread

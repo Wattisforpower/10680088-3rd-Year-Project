@@ -356,7 +356,7 @@ def FindGradients():
     elif ((Gradients[0] == 'POS') and (Gradients[1] == 'NEG') and (Gradients[2] == 'POS') and (Gradients[3] == 'POS')): # Test 17
         OverallPrediction.config(text = "Sunshine is Occuring or will Occur")
         Testing = 17
-    elif ((Gradients[0] == 'POS') and (Gradients[1] == 'POS') and (Gradients[2] == 'NEG') and (Gradients[3] == 'NEG')): # Test 18
+    elif ((Gradients[0] == 'POS') and (Gradients[1] == 'POS') and (Gradients[2] == 'NEG') and (Gradients[3] == 'POS')): # Test 18
         OverallPrediction.config(text = "Sunshine is Occuring or will Occur")
         Testing = 18
     elif ((Gradients[0] == 'POS') and (Gradients[1] == 'POS') and (Gradients[2] == 'POS') and (Gradients[3] == 'NEG')): # Test 19

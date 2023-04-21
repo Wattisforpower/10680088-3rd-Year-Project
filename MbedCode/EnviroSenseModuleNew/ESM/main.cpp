@@ -1,13 +1,15 @@
 #include "mbed.h"
-#include "sensorread.h"
 #include "stdio.h"
 #include <cstdarg>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <memory>
+
+#include "sensorread.h"
 #include "LoRa.h"
 #include "leds.h"
+#include "Acquisition.h"
 
 // The following is used to mitage the errors given about the following missing
 extern "C"{
@@ -64,6 +66,7 @@ extern "C"{
 SensorRead Sensors;
 LoRa DataSend;
 led led;
+Acquisition AcquireSignal;
 
 // Threads
 Thread Data;
@@ -81,6 +84,9 @@ void TriggerWatchdog();
 int main()
 {
     led.PowerOn();
+
+    AcquireSignal.RapidPoll(); // Rapidly polls "ACK" until signal is acquired from the receiver responding with "YES"
+
     //DataSend.Initialise();
 
     Data.start(DataThread);
@@ -90,7 +96,7 @@ int main()
     while (true){
         sleep();
     }
-
+    
     return 0;
 }
 

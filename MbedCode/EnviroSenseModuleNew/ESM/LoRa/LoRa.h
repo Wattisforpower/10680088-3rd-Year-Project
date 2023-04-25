@@ -13,6 +13,16 @@ class LoRa{
     public:
         void Initialise(void);
 
+        // Following is for either LoRaWAN or Bluetooth, please choose the appropriate option
+
+        // LoRaWAN
+        int CheckResponse(string acknowledgement, int timeout, string command);
+        int RecvPrase(void);
+        int NodeRecv(uint32_t timeout);
+        int NodeSend(void);
+        void NodeRecvThenSend(uint32_t timeout);
+        void NodeSendThenRecv(uint32_t timeout);
+
         // Bluetooth
         void Send(string data);
         void Recieve();

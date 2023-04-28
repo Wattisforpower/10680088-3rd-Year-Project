@@ -130,7 +130,7 @@ def FindGradients():
         Testing = 16
     elif ((Gradients[0] == 'POS') and (Gradients[1] == 'NEG') and (Gradients[2] == 'POS') and (Gradients[3] == 'POS')): # Test 17
         Testing = 17
-    elif ((Gradients[0] == 'POS') and (Gradients[1] == 'POS') and (Gradients[2] == 'NEG') and (Gradients[3] == 'POS')): # Test 18
+    elif ((Gradients[0] == 'POS') and (Gradients[1] == 'POS') and (Gradients[2] == 'NEG') and (Gradients[3] == 'NEG')): # Test 18
         Testing = 18
     elif ((Gradients[0] == 'POS') and (Gradients[1] == 'POS') and (Gradients[2] == 'POS') and (Gradients[3] == 'NEG')): # Test 19
         Testing = 19
@@ -451,13 +451,13 @@ def FunctionTestMain():
                 Result = FindGradients()
             case 11:
                 for i in range(9):
-                    TestEleven()
+                    TestEleven
                     TP[i+1], TH[i+1], TT[i+1], TSM[i+1] = TPressure, THumidity, TTemperature, TSMoisture
                 
                 Result = FindGradients()
             case 12:
                 for i in range(9):
-                    TestTwelve()
+                    TestTwelve
                     TP[i+1], TH[i+1], TT[i+1], TSM[i+1] = TPressure, THumidity, TTemperature, TSMoisture
                 
                 Result = FindGradients()

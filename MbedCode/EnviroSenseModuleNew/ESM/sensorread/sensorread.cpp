@@ -10,7 +10,7 @@ void SensorRead::initializeBME280(){
 
 void SensorRead::SoilMoistureSensor(){
     this->SoilMositureRAW = SM.read_u16();
-    this->SoilMositurePercentage = this->SoilMositureRAW / 65535;
+    this->SoilMositurePercentage = (this->SoilMositureRAW / 65535.0) * 100.0;
 }
 
 void SensorRead::BME280(){
@@ -34,4 +34,8 @@ void SensorRead::AppendData(){
     this->Humidity = to_string(this->BMEHumid);
     this->Temperature = to_string(this->BMETemp);
     this->SoilMoisture = to_string(this->SoilMositurePercentage);
+}
+
+float SensorRead::returnSM(){
+    return this->SoilMositurePercentage;
 }

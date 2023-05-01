@@ -3,7 +3,6 @@
 #include "stdio.h"
 #include <cstdarg>
 #include <cstdint>
-#include <cstdio>
 #include <cstring>
 #include <memory>
 #include "LoRa.h"
@@ -59,6 +58,7 @@ extern "C"{
 // INTERVALTIME
 #define INTERVALTIME 1s // Testing @1s actual 600s (10mins)
 
+using namespace std;
 
 // Classes
 SensorRead Sensors;
@@ -77,9 +77,13 @@ void DataThread();
 void CommsThread();
 void TriggerWatchdog();
 
+static BufferedSerial SerialPort(USBTX, USBRX);
+
 // main() runs in its own thread in the OS
 int main()
 {
+    SerialPort.set_baud(9600);
+    SerialPort.set_format(8, BufferedSerial::None, 1);
     led.PowerOn();
     //DataSend.Initialise();
 
@@ -111,6 +115,7 @@ void DataThread(){
 }
 
 void CommsThread(){
+    //float res = 10.0;
     while (true){
         DataProtection.trylock();
         string Result = Sensors.ReturnData();

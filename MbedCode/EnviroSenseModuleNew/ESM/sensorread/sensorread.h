@@ -5,11 +5,12 @@
 #include "mbed.h"
 #include <string>
 #include "BME280.h"
+#include <iostream>
 
 class SensorRead{
     protected:
         int SoilMositureRAW;
-        long SoilMositurePercentage;
+        double SoilMositurePercentage;
         long BMEPres, BMEHumid, BMETemp;
 
     public:
@@ -19,6 +20,7 @@ class SensorRead{
         void BME280();
         string ReturnData();
         void AppendData();
+        float returnSM();
 };
 
 #endif

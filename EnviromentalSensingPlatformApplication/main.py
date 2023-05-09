@@ -293,10 +293,6 @@ def FindGradients():
 
 
     # [0] = Pressure, [1] = Humidity, [2] = Temperature, [3] = Soil Moisture
-    #       NEG             POS             NC                  POS             Rainfall                        Test1
-    #       POS             NC              POS                 NEU/NEG         Sunshine                        Test2
-    #       NC              NC              NC                  POS             Watering of Soil                Test3
-    #       NC              NC              NC                  NEU/NEG         Sunshine                        Test2 (4)
     #       NEG             NEG             NEG                 NEG             Rainfall                        Test5
     #       NEG             NEG             NEG                 POS             Rainfall                        Test6
     #       NEG             NEG             POS                 NEG             Rainfall                        Test7

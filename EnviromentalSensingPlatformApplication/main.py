@@ -147,21 +147,21 @@ def RetrieveData():
 
     print(resString)
     ProcessedData = resString.split(',')
+    ProcessedData[3] = str((int(ProcessedData[3]) / 65535) * 100)
+
     print(ProcessedData)
 
     NullLabel.after(TimeBetweenchecks, RetrieveData)
 
 
-PressureGauge = tk_tools.Gauge(Dashboard, min_value= 0.0, max_value=2000.0, label="Pressure", unit="mBar", divisions= 20, yellow_low= 40, red_low= 30, yellow=60, red= 70) # change values once researched
+PressureGauge = tk_tools.Gauge(Dashboard, min_value= 0.0, max_value=2000.0, label="Pressure", unit="mBar", divisions= 20, yellow_low= 40, red_low= 30, yellow=60, red= 70)
 PressureGauge.place(x = 104, y = 100)
 
-HumidityGauge = tk_tools.Gauge(Dashboard, min_value=0.0, max_value=100.0, label="Humidity", unit="%", divisions= 10, yellow= 70, red = 90) # change values once researched
-HumidityGauge.place(x = 398, y = 100)
+HumidityGauge = tk_tools.Gauge(Dashboard, min_value=0.0, max_value=100.0, label="Humidity", unit="%", divisions= 10, yellow= 70, red = 90)
 
-TemperatureGauge = tk_tools.Gauge(Dashboard, min_value=-50.0, max_value=100.0, label="Temperature", unit="°C", divisions= 15, red_low= 20, yellow_low= 33.33, yellow= 80, red = 86.67) # change values once researched
-TemperatureGauge.place(x = 692, y = 100)
+TemperatureGauge = tk_tools.Gauge(Dashboard, min_value=-50.0, max_value=100.0, label="Temperature", unit="°C", divisions= 15, red_low= 20, yellow_low= 33.33, yellow= 80, red = 86.67)
 
-SoilMoistureGauge = tk_tools.Gauge(Dashboard, min_value=0.0, max_value=100.0, label="Soil Mositure", unit="%", divisions=10, yellow= 50, red= 90) # change values once researched
+SoilMoistureGauge = tk_tools.Gauge(Dashboard, min_value=0.0, max_value=100.0, label="Soil Mositure", unit="%", divisions=10, yellow= 50, red= 90)
 SoilMoistureGauge.place(x = 986, y = 100)
 
 

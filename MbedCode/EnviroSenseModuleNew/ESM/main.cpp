@@ -115,7 +115,7 @@ void DataThread(){
 }
 
 void CommsThread(){
-    //float res = 10.0;
+    
     while (true){
         DataProtection.trylock();
         string Result = Sensors.ReturnData();

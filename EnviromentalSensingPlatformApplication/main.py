@@ -22,6 +22,8 @@ import MachineLearning as ML
 # Global Variables
 COMPort = ''
 BaudRate = 0
+
+# Variable Arrays
 xPres = np.ones(10)
 yPres = np.ones(10)
 xHumidity = np.ones(10)
@@ -32,6 +34,8 @@ xSoilMoisture = np.ones(10)
 ySoilMoisture = np.ones(10)
 ProcessedData = ['0.0', '0.0', '0.0', '0.0']
 
+
+# CHANGE THIS IF DESIRED
 TimeBetweenchecks = 1000 #ms
 
 RegressedPressure = np.ones(10)
@@ -148,7 +152,10 @@ def RetrieveData():
     print(resString)
     ProcessedData = resString.split(',')
     ProcessedData[3] = str((int(ProcessedData[3]) / 65535) * 100)
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
     print(ProcessedData)
 
     NullLabel.after(TimeBetweenchecks, RetrieveData)

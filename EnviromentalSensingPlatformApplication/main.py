@@ -1,10 +1,10 @@
 # Environmental Sensing Platform Application
 # By Ethan Barrett
-# Last Update: 
+# Last Update:
+# 16/05/2023
 
 # Libraries
 import ImportData
-import math
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib.animation import FuncAnimation
@@ -14,7 +14,6 @@ import numpy as np
 import tkinter.font as font
 import tkinter as tk
 from tkinter import ttk
-from tkinter.ttk import Progressbar
 import tk_tools
 import time
 import MachineLearning as ML
@@ -69,7 +68,10 @@ EnterBaudRate = tk.Text(SignIn, height=2, width=20)
 EnterBaudRate.insert(tk.INSERT, "Baud Rate")
 EnterBaudRate.place(x = 550, y = 400)
 
-def RetrieveData():
+def RetrieveCOMData():
+    '''
+    Retrieves the communication data and stores it in Global Variables
+    '''
     global COMPort, BaudRate
     COMPort = EnterCOMPort.get("1.0", "end")
     COMPort = COMPort.strip("\n")
@@ -87,7 +89,7 @@ def RetrieveData():
 
     SignIn.destroy()
 
-SubmitBtn = tk.Button(SignIn, text="SUBMIT", command=RetrieveData, height = 2,  width=20)
+SubmitBtn = tk.Button(SignIn, text="SUBMIT", command=RetrieveCOMData, height = 2,  width=20)
 SubmitBtn.place(x = 560,y = 500)    
 
 
@@ -126,6 +128,9 @@ OverallPrediction = tk.Label(Predictions, text="")
 OverallPrediction.place(x = 500, y = 100)
 
 def ShiftArray(Array):
+    '''
+    Shifts arrays along 1
+    '''
     TempArray = np.ones(len(Array))
 
     for x in range(len(Array) - 1):
@@ -140,6 +145,9 @@ GaugeUpdate = tk.Label(Dashboard)
 
 
 def RetrieveData():
+    '''
+    Retrieves and Preprocesses COM Data
+    '''
     global COMSYS
     global ProcessedData
     res = COMSYS.readConnection()
@@ -157,6 +165,7 @@ def RetrieveData():
     NullLabel.after(TimeBetweenchecks, RetrieveData)
 
 
+# Gauge Setup and Display on GUI
 PressureGauge = tk_tools.Gauge(Dashboard, min_value= 0.0, max_value=2000.0, label="Pressure", unit="mBar", divisions= 20, yellow_low= 40, red_low= 30, yellow=60, red= 70)
 PressureGauge.place(x = 104, y = 100)
 
@@ -171,6 +180,9 @@ SoilMoistureGauge.place(x = 986, y = 100)
 
 
 def UpdateGauges():
+    '''
+    Updates Gauges with Values from Processed Data
+    '''
     PressureGauge.set_value(ProcessedData[0])
     HumidityGauge.set_value(ProcessedData[1])
     TemperatureGauge.set_value(ProcessedData[2])
@@ -187,6 +199,9 @@ UpdateGauges()
 HiddenLabel = tk.Label(Predictions)
 
 def PressureData():
+    '''
+    @Details: Processes the Pressure data for post processing
+    '''
     global xPres, yPres
     global ProcessedData
 
@@ -197,6 +212,9 @@ def PressureData():
     yPres[-1] = float(ProcessedData[0])
 
 def HumidityData():
+    '''
+    @Details: Processes the Humidity data for post processing
+    '''
     global xHumidity, yHumidity
     global ProcessedData
 
@@ -207,6 +225,9 @@ def HumidityData():
     yHumidity[-1] = float(ProcessedData[1])
 
 def TemperatureData():
+    '''
+    @Details: Processes the Temperature data for post processing
+    '''
     global xTemperature, yTemperature
     global ProcessedData
 
@@ -217,6 +238,9 @@ def TemperatureData():
     yTemperature[-1] = float(ProcessedData[2])
 
 def SoilMoistureData():
+    '''
+    @Details: Processes the Soil Moisture data for post processing
+    '''
     global xSoilMoisture, ySoilMoisture
     global ProcessedData
 
@@ -228,6 +252,9 @@ def SoilMoistureData():
 
 
 def CheckGradients(PG, HG, TG, SMG):
+    '''
+    Checks if the Gradient is Positive or Negative or Neutral
+    '''
     array = [PG, HG, TG, SMG]
     GradArray = ['','','','']
 
@@ -262,6 +289,11 @@ def CheckGradients(PG, HG, TG, SMG):
     return GradArray
 
 def FindGradients():
+    '''
+    Finds the Gradient of each Variable and filters them through the check gradients function before
+    going through an if-elif ladder to find the suitable combinations and displaying the appropriate
+    result.
+    '''
     # DeltaX, DeltaY
     Testing = 0
     global xPres, yPres, xHumidity, yHumidity, xTemperature, yTemperature, xSoilMoisture, ySoilMoisture
@@ -379,6 +411,10 @@ FindGradients()
 
 
 def Regress():
+    '''
+    @NOTE: NOT USED
+    @Details: Completes the Regression Algorithm for the Predictions
+    '''
     global NextPressure, NextHumidity, NextTemperature, NextSoilMositure
     global RegressedPressure, RegressedHumidity, RegressedTemperature, RegressedSoilMoisture
     global PressurePlotting, HumidityPlotting, TemperaturePlotting, SoilMoisturePlotting
@@ -418,6 +454,9 @@ def Regress():
     print(RegressedPressure)
 
 def Funcs():
+    '''
+    @Details: Runs the Graphing Tabs
+    '''
     PressureData()
     HumidityData()
     TemperatureData()
@@ -449,6 +488,9 @@ Tab5Display.get_tk_widget().pack()
 PlotHiddenLabel = tk.Label(Graphs)
 
 def PlotPressure(i):
+    '''
+    @Details: Plots Pressure Graphs
+    '''
     AllPlotP.cla()
 
     global PressurePlotting, RegressedPressure, xPres, yPres
@@ -457,6 +499,9 @@ def PlotPressure(i):
     AllPlotP.set_title("Pressure (mBar)")
 
 def PlotHumidity(i):
+    '''
+    @Details: Plots Humidity Graphs
+    '''
     AllPlotH.cla()
 
     global HumidityPlotting, RegressedHumidity, xHumidity, yHumidity
@@ -465,6 +510,9 @@ def PlotHumidity(i):
     AllPlotH.set_title("Humidity (%)")
 
 def PlotTemp(i):
+    '''
+    @Details: Plots Temperature Graphs
+    '''
     AllPlotT.cla()
 
     global TemperaturePlotting, RegressedTemperature, xTemperature, yTemperature
@@ -473,6 +521,9 @@ def PlotTemp(i):
     AllPlotT.set_title("Temperature (°C)")
 
 def PlotSoMo(i):
+    '''
+    @Details: Plots Soil Moisture Graphs
+    '''
     AllPlotSM.cla()
 
     global SoilMoisturePlotting, RegressedSoilMoisture, xSoilMoisture, ySoilMoisture
@@ -480,16 +531,10 @@ def PlotSoMo(i):
     AllPlotSM.plot(xSoilMoisture, ySoilMoisture)
     AllPlotSM.set_title("Soil Moisture (%)")
 
-
-
-
+# Runs the Function Animations
 AnimatePressure = FuncAnimation(FigureAll, PlotPressure, interval = 1000)
 AnimateHumidity = FuncAnimation(FigureAll, PlotHumidity, interval = 1000)
 AnimateTemperature = FuncAnimation(FigureAll, PlotTemp, interval = 1000)
 AnimateSoMo = FuncAnimation(FigureAll, PlotSoMo, interval = 1000)
     
 root.mainloop()
-
-
-
-

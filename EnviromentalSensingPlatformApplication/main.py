@@ -152,10 +152,6 @@ def RetrieveData():
     print(resString)
     ProcessedData = resString.split(',')
     ProcessedData[3] = str((int(ProcessedData[3]) / 65535) * 100)
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
     print(ProcessedData)
 
     NullLabel.after(TimeBetweenchecks, RetrieveData)
@@ -165,8 +161,10 @@ PressureGauge = tk_tools.Gauge(Dashboard, min_value= 0.0, max_value=2000.0, labe
 PressureGauge.place(x = 104, y = 100)
 
 HumidityGauge = tk_tools.Gauge(Dashboard, min_value=0.0, max_value=100.0, label="Humidity", unit="%", divisions= 10, yellow= 70, red = 90)
+HumidityGauge.place(x = 398, y = 100)
 
 TemperatureGauge = tk_tools.Gauge(Dashboard, min_value=-50.0, max_value=100.0, label="Temperature", unit="°C", divisions= 15, red_low= 20, yellow_low= 33.33, yellow= 80, red = 86.67)
+TemperatureGauge.place(x = 692, y = 100)
 
 SoilMoistureGauge = tk_tools.Gauge(Dashboard, min_value=0.0, max_value=100.0, label="Soil Mositure", unit="%", divisions=10, yellow= 50, red= 90)
 SoilMoistureGauge.place(x = 986, y = 100)
